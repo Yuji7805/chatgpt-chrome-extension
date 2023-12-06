@@ -1,0 +1,18 @@
+{
+  "optionsTitle": {
+    "message": "Einstellungen",
+    "description": "Titel der Einstellungen-Seite"
+  },
+  "apiTitle": {
+    "message": "API-Schlüssel eingeben:",
+    "description": "Titel der API-Schlüssel-Eingabe"
+  },
+  "apiModelTitle": {
+    "message": "Wähle ein API Model aus:",
+    "description": "Titel der API-Model-Auswahl"
+  },
+  "lastMessagesTitle": {
+    "message": "Letzte Nachrichten",
+    "description": "Titel der letzten Nachrichten"
+  }
+}

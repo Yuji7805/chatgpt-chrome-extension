@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="options.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
+      integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65"
+      crossorigin="anonymous"
+    />
+    <style>
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+      
+      th, td {
+        border: 1px solid black;
+        padding: 8px;
+        text-align: center;
+        color: white;        
+      }    
+      
+      form {
+        border-radius: 10px;
+        margin-bottom: 10px;
+        color: white;        
+      }      
+      
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="row mb-2">
+        <div class="col-sm">
+          <h1 id="titleText" class="text-white"></h1>
+        </div>
+      </div>
+      <div class="row input-row">
+        <div class="col-12">
+          <label
+            id="apiText"
+            for="input-api-key"
+            class="form-label text-white"
+          ></label>
+          <form class="input-form text-white" id="input-api-key">
+            <div class="d-flex form-group text-white">
+              <input
+                type="text"
+                class="form-control"
+                id="content"
+                name="content"
+                autocomplete="off"
+              />
+              <input
+                type="submit"
+                class="btn btn-primary"
+                value="Save"
+                id="submit"
+              />
+            </div>
+          </form>
+          <span id="status"></span>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-sm">
+          <button class="btn btn-danger" id="reset">Reset API-Key</button>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <div class="col-auto">
+          <label
+            id="choose-model-text"
+            for="apiModel"
+            class="form-label text-white"
+          ></label>
+          <select class="form-select" id="apiModel">
+            <option value="gpt-3.5-turbo">GPT-3.5-Turbo</option>
+            <option value="gpt-4">GPT-4</option>
+          </select>
+          <br>
+          <span id="status">
+            <!-- <div style = "color: white">Always on Top</div> -->
+            <div style="display:flex; justify-content: space-around; align-items: center; color: white;">
+              <input id = "topCheck" type="checkbox" style="color:white; height: 20px; width:20px">Always on Top</input>
+            </div>
+          </span>
+        </div>
+      </div>
+      <!-- Prompts -->
+      <h1 style="color: white;">Prompts</h1>        
+      <form id="form" style="display: flex; align-items: center; justify-content: space-between;">
+        <label for="prompt">Prompt:</label>
+        <input type="text" id="prompt" required style="width: 24%;" class="form-control">
+        <label for="description">Description:</label>
+        <input type="text" id="description" required style="width: 54%" class="form-control">
+        <button type="submit" class="btn btn-primary">Add</button>
+      </form>
+
+      <table id="table">
+        <tr>
+          <th style="width:30%">Prompt</th>
+          <th style="width:55%">Description</th>
+          <th>Actions</th>
+        </tr>
+      </table>
+<!-- Recommend -->
+      <h1 style="color:white">Pin Recommend</h1>
+      <div style = "color:white">
+        To make this extension easier, please let it reamin pinned by following steps below
+        <div class="col-sm">
+          1. Click the puzzle icon.
+        </div>
+        <div class="col-sm">
+          2. In the drop-down menu, find Sider.
+        </div>
+        <div class="col-sm">
+          3. In the drop-down menu, find Sider.
+        </div>
+        <button id = "check" style = "color:#0dcaf0; border:none; background-color:#6c757d">
+          OK, I've pinned.
+        </button>
+      </div>
+    </div>
+    <script src="options.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
