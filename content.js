@@ -67,7 +67,7 @@ const css = `
   margin: 0;
   padding: 0.5rem;
   background-color: #17475a;
-  min-width: 330px;
+  min-width: 480px;
   min-height: 135px;
   max-width: 650px;
   font-size: small;
@@ -99,13 +99,28 @@ p {
 	scrollbar-width: thin;
 }
 
-#prompt-selector{
+#stream-selector{
   margin-left: 4px;
   border: 1px solid #ccc;
   border-radius: 4px;  
   white-space: normal;
   word-break: break-all;
-  width: 100%;  
+  width: 50%;  
+  margin-right: 6px;
+  margin-bottom: 5px;
+  scrollbar-width: thin;  
+  overflow: scroll;
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 32px;
+}
+
+#prompt-selector{
+  border: 1px solid #ccc;
+  border-radius: 4px;  
+  white-space: normal;
+  word-break: break-all;
+  width: 50%;  
   margin-right: 10px;
   margin-bottom: 5px;
   scrollbar-width: thin;  
@@ -606,11 +621,21 @@ inputContainer.classList.add("input-container", "form-group");
 const query_selector = document.createElement("span");
 query_selector.id = "query-selector";
 
+// closeButton
 const closeButton = document.createElement("button");
 closeButton.id = "close-button";
 closeButton.classList.add("btn", "closeButton");
 closeButton.title = "Close";
 closeButton.innerHTML = `<i class="fa fa-times"></i>`;
+
+// streamSelector
+const stream_select = document.createElement("select");
+stream_select.id = "stream-selector";
+stream_select.innerHTML =
+  '<select class="form-select" id="chatThread"> </select>';
+
+
+// promptSelector
 const prompt_select = document.createElement("select");
 prompt_select.id = "prompt-selector";
 prompt_select.innerHTML =
@@ -620,6 +645,36 @@ inputContainer.appendChild(query_selector);
 
 let _jsonData = "";
 let _data = {};
+
+// get streams from chrome local storage
+getFromChromeStorage("streams_table")
+  .then((res) => {
+    console.log("from storage: ", res);
+    _jsonData = res;
+    if (_jsonData) {
+      // Parse the JSON data into a JavaScript object
+      try {
+        _data = JSON.parse(_jsonData) || {};
+        var optionElement = document.createElement("option"); // Create an option element
+        optionElement.value = "SELECT_STREAM"; // Set the value of the option to the key
+        optionElement.textContent = "SELECT_STREAM"; // Set the text content of the option to the key
+        stream_select.appendChild(optionElement);
+        for (var key in _data) {
+          if (_data.hasOwnProperty(key)) {
+            var optionElement = document.createElement("option"); // Create an option element
+            optionElement.value = key; // Set the value of the option to the key
+            optionElement.textContent = key; // Set the text content of the option to the key
+            stream_select.appendChild(optionElement); // Append the option to the select element
+          }
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
 // get prompts from chrome local storage
 getFromChromeStorage("prompts_table")
@@ -1021,8 +1076,10 @@ prompt_select.addEventListener("change", () => {
     submitButton.disabled = false;
   }
 });
+
 const promptSelectGroup = document.createElement("span");
 promptSelectGroup.style.display = "flex";
+promptSelectGroup.appendChild(stream_select);
 promptSelectGroup.appendChild(prompt_select);
 promptSelectGroup.appendChild(closeButton);
 const queryInputGroup = document.createElement("span");
@@ -1148,6 +1205,7 @@ insertBox.appendChild(inputContainer);
 insertBox.appendChild(stage);
 insertBox.appendChild(answerWrapper);
 
+// show extension UI when icon selected
 function showInputFields(e) {
   queryInput.focus();
   if (!topChecked) {
@@ -1172,10 +1230,13 @@ function showInputFields(e) {
   insertBox.style.display = "block";
   selectedText = "";
 }
+
+// hide UI when iconImage clicked
 function hideInputFields() {
   insertBox.style.display = "none";
 }
 
+// show extension UI when page text selected
 function showFloatingButton(event) {
   if (selectedText.length > 0) {
     currentPosX = event.pageX + 20;
@@ -1256,6 +1317,8 @@ let insertDrag = imageIcon;
 console.log(insertDrag.id);
 console.log(insertDrag.parentNode.id);
 
+
+// function that make html element as dragable
 function dragElement(elmnt) {
   var pos1 = 0,
     pos2 = 0,
@@ -1299,7 +1362,9 @@ function dragElement(elmnt) {
   hideFloatingButton();
 }
 
+// make insertBox as draggable
 dragElement(insertBox);
+
 function dragElementFloating(elmnt) {
   var pos1 = 0,
     pos2 = 0,
