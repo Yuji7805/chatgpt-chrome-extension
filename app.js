@@ -1,18 +1,29 @@
 async function getFromChromeStorage(key) {
-  const request = await new Promise((ree) =>
-    chrome.storage.local.get([key], (result) => ree(result.prompts_table))
-  );
+  console.log("current key: ", key);
+  const request = await new Promise((ree) => {
+    if (key == "prompts_table") {
+      chrome.storage.local.get([key], (result) => ree(result.prompts_table));
+    } else if (key == "streams_table") {
+      chrome.storage.local.get([key], (result) => ree(result.streams_table));
+    }
+  });
   console.log("via function: ", request);
   return request;
 }
 
 const form = document.getElementById("form");
+const form_stream = document.getElementById("form-stream");
 const table = document.getElementById("table");
+const table_stream = document.getElementById("table-stream");
 const promptInput = document.getElementById("prompt");
+const streamInput = document.getElementById("stream");
 const descriptionInput = document.getElementById("description");
 let selectedRow = null;
 
+// for prompt
 let _jsonData = "";
+// for stream
+let __jsonData = "";
 getFromChromeStorage("prompts_table")
   .then((res) => {
     _jsonData = res;
@@ -53,7 +64,7 @@ getFromChromeStorage("prompts_table")
         deleteButton.textContent = "Delete";
         deleteButton.addEventListener("click", function () {
           const toDel = row.querySelector("td").textContent;
-          remove_key(toDel);
+          remove_key(toDel, "prompts_table");
           table.deleteRow(row.rowIndex);
         });
         actionsCell.appendChild(editButton);
@@ -70,8 +81,115 @@ getFromChromeStorage("prompts_table")
   .catch((err) => {
     console.log(err);
   });
+
+getFromChromeStorage("streams_table")
+  .then((res) => {
+    __jsonData = res;
+    if (__jsonData) {
+      try {
+        __data = JSON.parse(__jsonData) || {};
+        console.log(__data);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    for (const key in __data) {
+      if (__data.hasOwnProperty(key)) {
+        const row = document.createElement("tr");
+
+        const streamCell = document.createElement("td");
+        streamCell.textContent = key;
+
+        const actionsCell = document.createElement("td");
+        // Create edit and delete buttons in the last cell
+        const editButton = document.createElement("button");
+        editButton.className = "btn btn-success";
+        editButton.textContent = "Edit";
+        editButton.style = "margin-left:10px; margin-right:10px";
+        editButton.addEventListener("click", function () {
+          streamInput.value = streamCell.textContent;
+          streamInput.disabled = true;
+          selectedRow = row;
+        });
+
+        const deleteButton = document.createElement("button");
+        deleteButton.className = "btn btn-danger";
+        deleteButton.textContent = "Delete";
+        deleteButton.addEventListener("click", function () {
+          const toDel = row.querySelector("td").textContent;
+          remove_key(toDel, "streams_table");
+          table_stream.deleteRow(row.rowIndex);
+        });
+        actionsCell.appendChild(editButton);
+        actionsCell.appendChild(deleteButton);
+
+        row.appendChild(streamCell);
+        row.appendChild(actionsCell);
+
+        table_stream.appendChild(row);
+      }
+    }
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+// prompts table data
 let _data = {};
+// streams table data
+let __data = {};
 console.log("dddd", _jsonData);
+
+// Add event listener to the form submit event
+form_stream.addEventListener("submit", function (e) {
+  e.preventDefault(); // Prevent form submission
+
+  const streamInput = document.getElementById("stream");
+  const stream = streamInput.value;
+
+  streamInput.disabled = false;
+
+  if (selectedRow) {
+    // Update the selected row with the new values
+    selectedRow.cells[0].textContent = stream;
+    selectedRow = null;
+  } else {
+    // Create a new row in the table
+    const row = table_stream.insertRow(-1);
+
+    // Insert cells with the stream
+    const streamCell = row.insertCell(0);
+    streamCell.textContent = stream;
+
+    // Create edit and delete buttons in the last cell
+    const editButton = document.createElement("button");
+    editButton.className = "btn btn-success";
+    editButton.textContent = "Edit";
+    editButton.style =
+      "margin-left:10px; margin-right:10px; margin-top:5px; margin-bottom:5px";
+    editButton.addEventListener("click", function () {
+      streamInput.value = streamCell.textContent;
+      streamInput.disabled = true;
+      selectedRow = row;
+    });
+
+    const deleteButton = document.createElement("button");
+    deleteButton.className = "btn btn-danger";
+    deleteButton.textContent = "Delete";
+    deleteButton.addEventListener("click", function () {
+      const toDel = row.querySelector("td").textContent;
+      remove_key(toDel, "streams_table");
+      table_stream.deleteRow(row.rowIndex);
+    });
+
+    const actionsCell = row.insertCell(1);
+    actionsCell.appendChild(editButton);
+    actionsCell.appendChild(deleteButton);
+  }
+  add_key_value(stream, "stream", "streams_table");
+  // Clear the form inputs
+  streamInput.value = "";
+});
 
 // Add event listener to the form submit event
 form.addEventListener("submit", function (e) {
@@ -104,7 +222,8 @@ form.addEventListener("submit", function (e) {
     const editButton = document.createElement("button");
     editButton.className = "btn btn-success";
     editButton.textContent = "Edit";
-    editButton.style = "margin-left:10px; margin-right:10px";
+    editButton.style =
+      "margin-left:10px; margin-right:10px; margin-top:5px; margin-bottom:5px";
     editButton.addEventListener("click", function () {
       promptInput.value = promptCell.textContent;
       promptInput.disabled = true;
@@ -118,7 +237,7 @@ form.addEventListener("submit", function (e) {
     deleteButton.textContent = "Delete";
     deleteButton.addEventListener("click", function () {
       const toDel = row.querySelector("td").textContent;
-      remove_key(toDel);
+      remove_key(toDel, "prompts_table");
       table.deleteRow(row.rowIndex);
     });
 
@@ -126,19 +245,20 @@ form.addEventListener("submit", function (e) {
     actionsCell.appendChild(editButton);
     actionsCell.appendChild(deleteButton);
   }
-  add_key_value(prompt, description);
+  add_key_value(prompt, description, "prompts_table");
   // Clear the form inputs
   promptInput.value = "";
   descriptionInput.value = "";
 });
 
-function add_key_value(prompt, description) {
-  // const jsonData = localStorage.getItem("prompts_table");
+function add_key_value(prompt, description, table_name) {
   let jsonData = "";
-  getFromChromeStorage("prompts_table")
+  console.log("+++tables of key and value====>>>", prompt, "  ", table_name);
+  getFromChromeStorage(table_name)
     .then((res) => {
       jsonData = res;
       let data = {};
+      console.log("local jsonData: ", jsonData);
       if (jsonData) {
         // Parse the JSON data into a JavaScript object
         try {
@@ -152,9 +272,13 @@ function add_key_value(prompt, description) {
       data[prompt] = description;
       // Convert the updated object back to JSON format
       const updatedJsonData = JSON.stringify(data);
+      console.log("updated jsonData: ", updatedJsonData);
       // Save the updated JSON data to local storage
-      chrome.storage.local.set({ prompts_table: updatedJsonData });
-      // localStorage.setItem("prompts_table", updatedJsonData);
+      if (table_name == "prompts_table") {
+        chrome.storage.local.set({ prompts_table: updatedJsonData });
+      } else if (table_name == "streams_table") {
+        chrome.storage.local.set({ streams_table: updatedJsonData });
+      }
     })
     .catch((err) => {
       console.log("err: ", err);
@@ -162,7 +286,7 @@ function add_key_value(prompt, description) {
 }
 
 function update_key_value(prompt, description) {
-  // const jsonData = localStorage.getItem("prompts_table");
+  console.log("update func called...");
   let jsonData = "";
   getFromChromeStorage("prompts_table")
     .then((res) => {
@@ -186,9 +310,9 @@ function update_key_value(prompt, description) {
     });
 }
 
-function remove_key(prompt) {
+function remove_key(prompt, table_name) {
   let jsonData = "";
-  getFromChromeStorage("prompts_table")
+  getFromChromeStorage(table_name)
     .then((res) => {
       jsonData = res;
       let data = {};
@@ -203,7 +327,11 @@ function remove_key(prompt) {
       delete data[prompt];
 
       const updatedJsonData = JSON.stringify(data);
-      chrome.storage.local.set({ prompts_table: updatedJsonData });
+      if (table_name == "prompts_table") {
+        chrome.storage.local.set({ prompts_table: updatedJsonData });
+      } else if (table_name == "streams_table") {
+        chrome.storage.local.set({ streams_table: updatedJsonData });
+      }
     })
     .catch((err) => {
       console.log(err);

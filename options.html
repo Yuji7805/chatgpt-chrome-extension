@@ -89,20 +89,36 @@
           </span>
         </div>
       </div>
+
+      <!-- Streams -->
+      <h1 style="color: white;">Streams</h1>        
+      <form id="form-stream" style="display: flex; align-items: center; justify-content: space-between;">
+        <label for="stream">Stream:</label>
+        <input type="text" id="stream" required style="margin-left: 7px; margin-right: 7px;" class="form-control">                
+        <button type="submit" class="btn btn-primary">Add</button>
+      </form>
+
+      <table id="table-stream">
+        <tr>
+          <th style="width:80%">Stream</th>          
+          <th>Actions</th>
+        </tr>
+      </table>
+
       <!-- Prompts -->
       <h1 style="color: white;">Prompts</h1>        
       <form id="form" style="display: flex; align-items: center; justify-content: space-between;">
         <label for="prompt">Prompt:</label>
-        <input type="text" id="prompt" required style="width: 24%;" class="form-control">
+        <input type="text" id="prompt" required style="margin-left: 7px; margin-right: 16px;" class="form-control">
         <label for="description">Description:</label>
-        <input type="text" id="description" required style="width: 54%" class="form-control">
+        <input type="text" id="description" required style="margin-left: 7px; margin-right: 7px;" class="form-control">
         <button type="submit" class="btn btn-primary">Add</button>
       </form>
 
       <table id="table">
         <tr>
           <th style="width:30%">Prompt</th>
-          <th style="width:55%">Description</th>
+          <th style="width:50%">Description</th>
           <th>Actions</th>
         </tr>
       </table>

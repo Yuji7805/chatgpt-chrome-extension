@@ -410,9 +410,13 @@ let currentPosY = 0;
 
 // extract data from storage
 async function getFromChromeStorage(key) {
-  const request = await new Promise((ree) =>
-    chrome.storage.local.get([key], (result) => ree(result.prompts_table))
-  );
+  const request = await new Promise((ree) => {
+    if (key == "prompts_table") {
+      chrome.storage.local.get([key], (result) => ree(result.prompts_table));
+    } else if (key == "streams_table") {
+      chrome.storage.local.get([key], (result) => ree(result.streams_table));
+    }
+  });
   return request;
 }
 
@@ -549,7 +553,7 @@ function displayQueriesAnswers() {
           day: "2-digit",
           hour: "2-digit",
           minute: "2-digit",
-          second: "2-digit"
+          second: "2-digit",
         };
         const time = new Date().toLocaleString("en-US", options);
         const timeStampElem = `<div class="timeStamp">${
@@ -633,7 +637,6 @@ const stream_select = document.createElement("select");
 stream_select.id = "stream-selector";
 stream_select.innerHTML =
   '<select class="form-select" id="chatThread"> </select>';
-
 
 // promptSelector
 const prompt_select = document.createElement("select");
@@ -853,12 +856,12 @@ submitButton.addEventListener("click", async () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
         model: apiModel,
-        messages: messageArray
-      })
+        messages: messageArray,
+      }),
     });
 
     if (!response.ok) {
@@ -942,7 +945,7 @@ submitButton.addEventListener("click", async () => {
       day: "2-digit",
       hour: "2-digit",
       minute: "2-digit",
-      second: "2-digit"
+      second: "2-digit",
     };
     const time = new Date().toLocaleString("en-US", options);
 
@@ -999,7 +1002,7 @@ submitButton.addEventListener("click", async () => {
           day: "2-digit",
           hour: "2-digit",
           minute: "2-digit",
-          second: "2-digit"
+          second: "2-digit",
         };
         const time = new Date().toLocaleString("en-US", options);
         const timeStampElem = `<div class="timeStamp">${
@@ -1152,7 +1155,7 @@ chrome.storage.local.get(["queriesAnswers"], ({ queriesAnswers }) => {
         day: "2-digit",
         hour: "2-digit",
         minute: "2-digit",
-        second: "2-digit"
+        second: "2-digit",
       };
       const time = new Date().toLocaleString("en-US", options);
       const timeStampElem = `<div class="timeStamp">${timeStamp || time}</div>`;
@@ -1317,14 +1320,13 @@ let insertDrag = imageIcon;
 console.log(insertDrag.id);
 console.log(insertDrag.parentNode.id);
 
-
 // function that make html element as dragable
 function dragElement(elmnt) {
   var pos1 = 0,
     pos2 = 0,
     pos3 = 0,
     pos4 = 0;
-  if (elmnt.id == "insertBox") {    
+  if (elmnt.id == "insertBox") {
     imageIcon.onmousedown = dragMouseDown;
   } else {
     imageIcon.onmousedown = dragMouseDown;
