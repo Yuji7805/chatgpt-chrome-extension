@@ -95,12 +95,15 @@
       <form id="form-stream" style="display: flex; align-items: center; justify-content: space-between;">
         <label for="stream">Stream:</label>
         <input type="text" id="stream" required style="margin-left: 7px; margin-right: 7px;" class="form-control">                
-        <button type="submit" class="btn btn-primary">Add</button>
+        <label for="instruction">Instruction:</label>
+        <input type="text" id="instruction" required style="margin-left: 7px; margin-right: 7px;" class="form-control">        
+        <button type="submit" class="btn btn-primary">Add</button>        
       </form>
 
       <table id="table-stream">
         <tr>
-          <th style="width:80%">Stream</th>          
+          <th style="width:30%">Stream</th>
+          <th style="width:50%">Instruction</th>
           <th>Actions</th>
         </tr>
       </table>
