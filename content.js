@@ -405,16 +405,22 @@ p {
 }
 `;
 
+let assistants = [];
+
 let currentPosX = 0;
 let currentPosY = 0;
 
 // extract data from storage
 async function getFromChromeStorage(key) {
+  console.log("key table called...");
+  console.log(key);
   const request = await new Promise((ree) => {
     if (key == "prompts_table") {
       chrome.storage.local.get([key], (result) => ree(result.prompts_table));
     } else if (key == "streams_table") {
       chrome.storage.local.get([key], (result) => ree(result.streams_table));
+    } else {
+      chrome.storage.local.get([key], (result) => ree(result.openai_thdid));
     }
   });
   return request;
@@ -450,53 +456,6 @@ console.log("contents acc: ", topChecked);
 const _md =
   "b2d80efc8db1a49f3c39a9419fd6bb41a17ef583e37a8bcd5fe8305bda33da601cfbd26f1696211996f6c039db85408990f6bc3eb52158788f6637276217912a8dcea62117bc27057bc1c78c89f9bdd4eada7a460db7efcabb2dc0b641dd4b1f6564b5b0a583e163068ec30c5e41880e6d593cab053dccfde4ee56b5711c7cc3b222d8cb7adcf25a18bce165c9d57244c68d87c33200f9e4d9ecd8090c829c9139f4410773d77bf6be987bbb148771ea98c820b74330a436c667c1d4796d334cdf0c662d9a40398e14c25009169688ce1b4924cb620a894778dab8765d43e31cef58246d332738f7ccdd5b8a5169e27682ea2d39a54c8b5b9d3cbfd53ecc012edd99d1d57fa0176ce1a41317b8a00aa19a5a948c8a681da968d90e69f2be4c86587e844cbbaeb73ff264c7c7bcbc161030fd99103dd6560afa0027b782130bf1b505acbb74b167aa9e80df101ec88dc0d5267b6865d1d5f34dbb2ff0473f37aa33102812ad2a46efd175fe7aca77c25b5de2ba8170a6027ec437aaef94f1c2ed2d4fd36f3f55f38a4e6ec5300dfaee9cba7b16149b5d4d2b3bef692611436e61e059f881d12ec5d6c3b05306a745e49ad846e6082375fb5c8fba66ec55acabdf56e5e48b0848cca9e8ac0f6b76f2d8cf1a417385efadaabf30ac6ea74d9f812719bb44505c608222cbe056671614d26809783190fe29133993cd53708cc9df874b5e7320ce527b3ffe4539cb95d3828985d34b6ef3f8be373e7b84292f76b1cebafd4c377f5c4916ef300fed1b019b7e9b806ce3fdac8e81a753fd3673fce4bf40b6ab334e95d061a9cc1244be3e76f930d16d5d0a17521d5a683a4b5103945be47a5c04af65472bef12b2ee7b1d7a1b89474ae1febbab13304e1b55fc04ff211370dfc07803f15736fe53784f4c46fb606debff71edced07cde118059e3dbfd8962fb31bd5d016e9d2320274d7d2cd6388c34173ee004cb490f8fb973d3bca729d9d1054a814d8bfbc17f08347c21aba27e8af6217303d236f9bfce20260e0342f88fc6b7be1c6f421fa28a94243a0787315e2b3960f992ce55adc531c375e5575f3f15efee5bb51deefb9d819b79eb28f2cd8fdebff6c15aea1ce84e74354d6f458f91f260b388b51a77e65eb284a0928ae87b3361d6d0653c402c5a62f1ca061db579c9ef5243b04a9788fc5e4cec679721d8de94c27fe45e1ac837eb8cdf1609070d2db50a18483cdc2d240935966cfae629ca19a91068a6ab112b7b4b887e8a26e4e9dab4b6b20f17de533c92c38ac289e2717b4120566c3e961bd354741507b0e28fb8e1283d5087696caaabdcdbe60a660e2b2a3d9859676c025ed100f202c3a2d922af4ff211b6fe1168a55a0bced4d14e8cda5e68d655d75bcb8a3894a22fcadf14ca7a7fe15585b7821bf68c05e902493b0e46eb47613ea1438ef4";
 
-// Base64 decoding function of API key
-function base64Decode(inputText) {
-  let encodedText = inputText;
-  var chars =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-  var padding = 0;
-  var decodedDataLength = (encodedText.length / 4) * 3;
-
-  if (encodedText.charAt(encodedText.length - 1) === "=") {
-    padding++;
-    decodedDataLength--;
-  }
-  if (encodedText.charAt(encodedText.length - 2) === "=") {
-    padding++;
-    decodedDataLength--;
-  }
-
-  var decodedData = new Uint8Array(decodedDataLength);
-
-  for (var i = 0, j = 0; i < encodedText.length; i += 4, j += 3) {
-    var group =
-      (chars.indexOf(encodedText.charAt(i)) << 18) |
-      (chars.indexOf(encodedText.charAt(i + 1)) << 12) |
-      (chars.indexOf(encodedText.charAt(i + 2)) << 6) |
-      chars.indexOf(encodedText.charAt(i + 3));
-
-    decodedData[j] = (group >> 16) & 255;
-    decodedData[j + 1] = (group >> 8) & 255;
-    decodedData[j + 2] = group & 255;
-  }
-
-  return decodedData;
-}
-
-// descript function
-function decrypt(encryptedText, key) {
-  var decodedData = base64Decode(encryptedText);
-  var decryptedData = new Uint8Array(decodedData.length);
-
-  for (var i = 0; i < decodedData.length; i++) {
-    decryptedData[i] = decodedData[i] ^ key.charCodeAt(i % key.length);
-  }
-
-  var decoder = new TextDecoder();
-  var decryptedText = decoder.decode(decryptedData);
-  return decryptedText;
-}
 let pasteTarget = "";
 
 const style = document.createElement("style");
@@ -609,7 +568,7 @@ function displayQueriesAnswers() {
 var insertBox = document.createElement("div");
 insertBox.id = "insertBox";
 
-// components that consists of imageIcon, promptSelector, closeButton, queryInput, submitButton
+// components that consists of imageIcon, promptSelector, closeButton, query_input, submitButton
 // initially visible to user
 const inputContainer = document.createElement("div");
 
@@ -621,7 +580,7 @@ inputContainer.appendChild(imageIcon);
 
 inputContainer.classList.add("input-container", "form-group");
 
-// 4 elements including promptSelector, closeButton, queryInput, submitButton
+// 4 elements including promptSelector, closeButton, query_input, submitButton
 const query_selector = document.createElement("span");
 query_selector.id = "query-selector";
 
@@ -646,29 +605,26 @@ prompt_select.innerHTML =
 inputContainer.appendChild(query_selector);
 // inputContainer.appendChild(closeButton);
 
-let _jsonData = "";
 let _data = {};
 
 // get streams from chrome local storage
 getFromChromeStorage("streams_table")
   .then((res) => {
     console.log("from storage: ", res);
-    _jsonData = res;
-    if (_jsonData) {
+    assistants = res;
+    if (res) {
       // Parse the JSON data into a JavaScript object
       try {
-        _data = JSON.parse(_jsonData) || {};
         var optionElement = document.createElement("option"); // Create an option element
         optionElement.value = "SELECT_STREAM"; // Set the value of the option to the key
         optionElement.textContent = "SELECT_STREAM"; // Set the text content of the option to the key
         stream_select.appendChild(optionElement);
-        for (var key in _data) {
-          if (_data.hasOwnProperty(key)) {
-            var optionElement = document.createElement("option"); // Create an option element
-            optionElement.value = key; // Set the value of the option to the key
-            optionElement.textContent = key; // Set the text content of the option to the key
-            stream_select.appendChild(optionElement); // Append the option to the select element
-          }
+        for (var asstIdx in res) {
+          console.log("$$$ " + res[asstIdx]["name"]);
+          var optionElement = document.createElement("option"); // Create an option element
+          optionElement.value = res[asstIdx]["name"]; // Set the value of the option to the key
+          optionElement.textContent = res[asstIdx]["name"]; // Set the text content of the option to the key
+          stream_select.appendChild(optionElement); // Append the option to the select element
         }
       } catch (err) {
         console.log(err);
@@ -711,13 +667,13 @@ getFromChromeStorage("prompts_table")
 let prompt_question = "";
 
 // query input element
-const queryInput = document.createElement("textarea");
-queryInput.type = "text";
-queryInput.id = "query-input";
-queryInput.placeholder = "What's on your mind?";
-queryInput.className = "query-input";
+const query_input = document.createElement("textarea");
+query_input.type = "text";
+query_input.id = "query-input";
+query_input.placeholder = "What's on your mind?";
+query_input.className = "query-input";
 
-queryInput.focus();
+query_input.focus();
 
 const submitButton = document.createElement("button");
 submitButton.id = "submit-button";
@@ -742,15 +698,15 @@ submitButton.appendChild(submitButtonIcon);
 
 chrome.runtime.sendMessage({ api_initiated: true });
 
-queryInput.addEventListener("keyup", () => {
-  if (queryInput.value === "") {
+query_input.addEventListener("keyup", () => {
+  if (query_input.value === "") {
     submitButton.disabled = true;
   } else {
     submitButton.disabled = false;
   }
 });
 
-queryInput.addEventListener("keyup", (event) => {
+query_input.addEventListener("keyup", (event) => {
   if (event.code === "Enter") {
     event.preventDefault();
     submitButton.click();
@@ -831,53 +787,81 @@ showHideWrapper.appendChild(showHideLastAnswerButton);
 const queriesAnswersContainer = document.createElement("div");
 queriesAnswersContainer.id = "queriesAnswersContainer";
 
+function findAssistantId() {
+  var asstId = "";
+  console.log("++++++++++++++");
+  console.log(assistants);
+  var asstname = "";
+  asstname = stream_select.value;
+  if (asstname !== "SELECT_STREAM") {
+    for (var asstIdx in assistants) {
+      if (asstname === assistants[asstIdx]["name"]) {
+        asstId = assistants[asstIdx]["id"];
+      }
+    }
+  }
+  return asstId;
+}
+
+let thdId = "";
+getFromChromeStorage("openai_thdid")
+  .then((res) => {
+    console.log("from storage THD: ", res);
+    thdId = res;
+  })
+  .catch((err) => {
+    console.log("Can't find openai thread id");
+    console.log(err);
+  });
+
 //click answer button
 submitButton.addEventListener("click", async () => {
-  const message = queryInput.value;
+  const message = query_input.value;
 
   answer.innerHTML = "";
-
   answerWrapper.style.display = "none";
-
   loadingIndicator.style.display = "block";
 
   messageArray.push({ role: "user", content: message });
-
-  let apiKey = await new Promise((resolve) =>
-    chrome.storage.local.get(["apiKey"], (result) => resolve(result.apiKey))
-  );
-  apiKey = decrypt(apiKey, _md);
-  let apiModel = await new Promise((resolve) =>
-    chrome.storage.local.get(["apiModel"], (result) => resolve(result.apiModel))
-  );
-
+  var asstId = findAssistantId();
+  var content = query_input.value;
+  var thdid = thdId;
+  console.log(content);
+  console.log(thdid);
+  console.log(asstId);
+  let gptAnswer = "data";
   try {
-    let response = await fetch("https://api.openai.com/v1/chat/completions", {
+    fetch("http://127.0.0.1:5000/openai/run", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
+        "content-type": "application/json",
+        // "Access-Control-Allow-Origin": "https://web.telegram.org",
+        // "Access-Control-Allow-Headers": "Content-Type",
       },
       body: JSON.stringify({
-        model: apiModel,
-        messages: messageArray,
+        thdid: thdId,
+        asstid: asstId,
+        content: content,
       }),
-    });
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        // Handle the response data here
+        console.log(data);
+        gptAnswer = data["content"][0]["text"];
+        console.log(gptAnswer);
+        answerWrapper.style.display = "block";
+        let answerWithBreaks = gptAnswer.replace(/\n/g, "<br>");
+        answer.innerHTML = answerWithBreaks;
+      })
+      .catch((error) => {
+        // Handle any errors here
+        console.error("Error:", error);
+      });
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch. Status code: ${response.status}`);
-    }
     let count = 0;
-    let data = await response.json();
-
-    let gptAnswer = data["choices"][0]["message"]["content"];
-
-    answerWrapper.style.display = "block";
-    let answerWithBreaks = gptAnswer.replace(/\n/g, "<br>");
-    answer.innerHTML = answerWithBreaks;
     copyAnswer.addEventListener("click", () => {
       const answerText = gptAnswer;
-
       navigator.clipboard
         .writeText(answerText)
         .then(() => console.log("Answer text copied to clipboard"))
@@ -894,7 +878,7 @@ submitButton.addEventListener("click", async () => {
           finalTarget.tagName,
           finalTarget.className
         );
-        queryInput.value = "";
+        query_input.value = "";
         var exisitingText = finalTarget.value;
         finalTarget.value = exisitingText + answerText;
         setTimeout(function () {
@@ -912,7 +896,7 @@ submitButton.addEventListener("click", async () => {
         pasteTarget.classList.contains("public-DraftStyleDefault-block")
       ) {
         let answerText = "\n" + gptAnswer;
-        queryInput.value = "";
+        query_input.value = "";
         var terminalTarget = pasteTarget.querySelector("span");
         var finalTarget = terminalTarget.querySelector("span");
         finalTarget.innerHTML += answerText;
@@ -927,7 +911,7 @@ submitButton.addEventListener("click", async () => {
       } else if (count == 0) {
         let answerText = "\n" + gptAnswer;
         console.log("previous content: ", pasteTarget.innerHTML);
-        queryInput.value = "";
+        query_input.value = "";
 
         pasteTarget.innerHTML += answerText;
         console.log("current content is:", pasteTarget.innerHTML);
@@ -953,15 +937,15 @@ submitButton.addEventListener("click", async () => {
 
     loadingIndicator.style.display = "none";
 
-    const query = queryInput.value;
+    // const query = query_input.value;
 
-    chrome.storage.local.get({ queriesAnswers: [] }, ({ queriesAnswers }) => {
-      queriesAnswers.push({ query, gptAnswer, timeStamp: time });
+    // chrome.storage.local.get({ queriesAnswers: [] }, ({ queriesAnswers }) => {
+    //   queriesAnswers.push({ query, gptAnswer, timeStamp: time });
 
-      chrome.storage.local.set({ queriesAnswers }, () => {
-        console.log("queriesAnswers array updated");
-      });
-    });
+    //   chrome.storage.local.set({ queriesAnswers }, () => {
+    //     console.log("queriesAnswers array updated");
+    //   });
+    // });
   } catch (error) {
     console.log(error);
 
@@ -971,87 +955,87 @@ submitButton.addEventListener("click", async () => {
     loadingIndicator.style.display = "none";
   }
 
-  chrome.storage.local.get(["queriesAnswers"], ({ queriesAnswers }) => {
-    if (!queriesAnswers || queriesAnswers.length === 0) {
-      return;
-    }
+  // chrome.storage.local.get(["queriesAnswers"], ({ queriesAnswers }) => {
+  //   if (!queriesAnswers || queriesAnswers.length === 0) {
+  //     return;
+  //   }
 
-    queriesAnswers = queriesAnswers.reverse();
+  //   queriesAnswers = queriesAnswers.reverse();
 
-    if (queriesAnswers.length > 0) {
-      showHideWrapper.style.display = "flex";
+  //   if (queriesAnswers.length > 0) {
+  //     showHideWrapper.style.display = "flex";
 
-      queriesAnswersContainer.innerHTML = "";
+  //     queriesAnswersContainer.innerHTML = "";
 
-      queriesAnswers.forEach(({ query, tmpAnswer, timeStamp }, i) => {
-        const answerWithBreaks = tmpAnswer.replace(/\n/g, "<br>");
+  //     queriesAnswers.forEach(({ query, tmpAnswer, timeStamp }, i) => {
+  //       const answerWithBreaks = tmpAnswer.replace(/\n/g, "<br>");
 
-        const item = document.createElement("div");
-        item.className = "queriesAnswers";
+  //       const item = document.createElement("div");
+  //       item.className = "queriesAnswers";
 
-        item.style.marginBottom =
-          i < queriesAnswers.length - 1 ? "0.5rem" : "0";
+  //       item.style.marginBottom =
+  //         i < queriesAnswers.length - 1 ? "0.5rem" : "0";
 
-        const removeButton = `<button id=removeButton${i} class="btn removeButton" title="Remove this query and answer from the list"><i class="fa fa-trash"></i></button>`;
+  //       const removeButton = `<button id=removeButton${i} class="btn removeButton" title="Remove this query and answer from the list"><i class="fa fa-trash"></i></button>`;
 
-        const copyButton = `<button id=copyLastAnswer${i} class="btn copyButton" title="Copy the Answer to the Clipboard"><i class="fa fa-copy" style="font-size: small"></i></button>`;
-        const insertButton = `<button id=copyLastAnswer${i} class="btn insertButton" title="Insert the Answer to the edit"><i class="fa-sharp fa-light fa-paste" style="color: #090101;"></i></button>`;
+  //       const copyButton = `<button id=copyLastAnswer${i} class="btn copyButton" title="Copy the Answer to the Clipboard"><i class="fa fa-copy" style="font-size: small"></i></button>`;
+  //       const insertButton = `<button id=copyLastAnswer${i} class="btn insertButton" title="Insert the Answer to the edit"><i class="fa-sharp fa-light fa-paste" style="color: #090101;"></i></button>`;
 
-        const options = {
-          month: "short",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-        };
-        const time = new Date().toLocaleString("en-US", options);
-        const timeStampElem = `<div class="timeStamp">${
-          timeStamp || time
-        }</div>`;
+  //       const options = {
+  //         month: "short",
+  //         day: "2-digit",
+  //         hour: "2-digit",
+  //         minute: "2-digit",
+  //         second: "2-digit",
+  //       };
+  //       const time = new Date().toLocaleString("en-US", options);
+  //       const timeStampElem = `<div class="timeStamp">${
+  //         timeStamp || time
+  //       }</div>`;
 
-        item.innerHTML = `
-          <div style="color: rgb(188, 188, 188); margin-bottom: 0.2rem;">${query}</div>
-          <div>${answerWithBreaks}</div>
-          <div class="copyRow">
-            ${timeStampElem}
-            <div>${removeButton}${copyButton}${insertButton}</div>
-          </div>
-        `;
+  //       item.innerHTML = `
+  //         <div style="color: rgb(188, 188, 188); margin-bottom: 0.2rem;">${query}</div>
+  //         <div>${answerWithBreaks}</div>
+  //         <div class="copyRow">
+  //           ${timeStampElem}
+  //           <div>${removeButton}${copyButton}${insertButton}</div>
+  //         </div>
+  //       `;
 
-        queriesAnswersContainer.appendChild(item);
+  //       queriesAnswersContainer.appendChild(item);
 
-        document
-          .getElementById(`removeButton${i}`)
-          .addEventListener("click", () => {
-            queriesAnswers.splice(i, 1);
+  //       document
+  //         .getElementById(`removeButton${i}`)
+  //         .addEventListener("click", () => {
+  //           queriesAnswers.splice(i, 1);
 
-            chrome.storage.local.set({ queriesAnswers }, () => {
-              console.log("queriesAnswers array updated");
-            });
+  //           chrome.storage.local.set({ queriesAnswers }, () => {
+  //             console.log("queriesAnswers array updated");
+  //           });
 
-            item.remove();
+  //           item.remove();
 
-            if (queriesAnswers.length === 0) {
-              showHideWrapper.style.display = "none";
-              queriesAnswersContainer.style.display = "none";
-            }
-          });
+  //           if (queriesAnswers.length === 0) {
+  //             showHideWrapper.style.display = "none";
+  //             queriesAnswersContainer.style.display = "none";
+  //           }
+  //         });
 
-        document
-          .getElementById(`copyLastAnswer${i}`)
-          .addEventListener("click", () => {
-            const answerText = answer;
+  //       document
+  //         .getElementById(`copyLastAnswer${i}`)
+  //         .addEventListener("click", () => {
+  //           const answerText = answer;
 
-            navigator.clipboard
-              .writeText(answerText)
-              .then(() => console.log("Answer text copied to clipboard"))
-              .catch((err) => console.error("Could not copy text: ", err));
-          });
-      });
-    } else {
-      showHideWrapper.style.display = "none";
-    }
-  });
+  //           navigator.clipboard
+  //             .writeText(answerText)
+  //             .then(() => console.log("Answer text copied to clipboard"))
+  //             .catch((err) => console.error("Could not copy text: ", err));
+  //         });
+  //     });
+  //   } else {
+  //     showHideWrapper.style.display = "none";
+  //   }
+  // });
 });
 
 function checkPrompt(prompt_question) {
@@ -1075,7 +1059,7 @@ prompt_select.addEventListener("change", () => {
     prompt_question += "\n";
   }
   if (localStorage.getItem("selectedText").length > 0) {
-    queryInput.value = prompt_question + localStorage.getItem("selectedText");
+    query_input.value = prompt_question + localStorage.getItem("selectedText");
     submitButton.disabled = false;
   }
 });
@@ -1088,7 +1072,7 @@ promptSelectGroup.appendChild(closeButton);
 const queryInputGroup = document.createElement("span");
 queryInputGroup.style.display = "flex";
 
-queryInputGroup.appendChild(queryInput);
+queryInputGroup.appendChild(query_input);
 queryInputGroup.appendChild(submitButton);
 query_selector.appendChild(promptSelectGroup);
 query_selector.appendChild(queryInputGroup);
@@ -1210,11 +1194,12 @@ insertBox.appendChild(answerWrapper);
 
 // show extension UI when icon selected
 function showInputFields(e) {
-  queryInput.focus();
+  query_input.focus();
   if (!topChecked) {
     console.log(localStorage.getItem("selectedText"));
     if (localStorage.getItem("selectedText").length > 0) {
-      queryInput.value = prompt_question + localStorage.getItem("selectedText");
+      query_input.value =
+        prompt_question + localStorage.getItem("selectedText");
       submitButton.disabled = false;
     }
     insertBox.style.left = `${currentPosX - 375}px`;
@@ -1308,7 +1293,7 @@ document.addEventListener("mouseup", function (event) {
       selectedText = window.getSelection().toString();
       localStorage.setItem("selectedText", selectedText);
       pasteTarget = event.target;
-      queryInput.value = localStorage.getItem("selectedText");
+      query_input.value = localStorage.getItem("selectedText");
       submitButton.disabled = false;
       showFloatingButton(event);
       hideFloatingButton();
