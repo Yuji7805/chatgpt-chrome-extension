@@ -51,7 +51,7 @@ let assistants = [];
 //   return decryptedText;
 // }
 function findAssistantId(asstname) {
-  var asstId = "";
+  var asstId = "default asstid";
   if (asstname !== "SELECT_STREAM") {
     for (var asstIdx in assistants) {
       if (asstname === assistants[asstIdx]["name"]) {
@@ -73,7 +73,7 @@ async function getFromChromeStorage(key) {
       chrome.storage.local.get([key], (result) => ree(result.openai_thdid));
     }
   });
-  console.log("via function: ", request);
+  // console.log("via function: ", request);
   return request;
 }
 
@@ -149,12 +149,11 @@ getFromChromeStorage("prompts_table")
   });
 
 async function makeThread() {
-  chrome.storage.local.set({ openai_thdid: "" });
   var thdId = "";
-  thdId = String(getFromChromeStorage("openai_thdid"));
-  console.log(thdId + " from local storage");
-  if (!thdId.startsWith("thread_")) {
-    fetch("http://127.0.0.1:5000/openai/threads/create", {
+  thdId = await getFromChromeStorage("openai_thdid");
+  thdId = JSON.parse(thdId);
+  if (!String(thdId["openai_thdid"]).startsWith("thread_")) {
+    fetch("http://136.243.150.17:5000/openai/threads/create", {
       method: "POST",
     })
       .then((response) => response.json())
@@ -162,12 +161,15 @@ async function makeThread() {
         // Handle the response data here
         thdId = data["thdid"];
         console.log("thread created. ", thdId);
-        chrome.storage.local.set({ openai_thdid: thdId });
+        // chrome.storage.local.set({ openai_thdid: thdId });
+        add_key_value("openai_thdid", thdId, "openai_thdid");
       })
       .catch((error) => {
         // Handle any errors here
         console.log(error);
       });
+  } else {
+    console.log("using existing thread.", thdId["openai_thdid"]);
   }
 }
 makeThread();
@@ -177,90 +179,93 @@ async function fetchDataFromAPI() {
   const instructionInput = document.getElementById("instruction");
   chrome.storage.local.set({ streams_table: {} });
   console.log("fetching data from openai assistants");
-  fetch("http://127.0.0.1:5000//openai/assistants", {
-    method: "GET",
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+  try {
+    const response = await fetch(
+      "http://136.243.150.17:5000/openai/assistants",
+      {
+        method: "GET",
+        headers: {
+          "content-type": "application/json",
+        },
       }
-      return response.json();
-    })
-    .then((data) => {
-      const __data = data.data;
-      assistants = __data;
-      console.log("_____________________");
-      console.log(__data);
-      chrome.storage.local.set({ streams_table: assistants });
-      if (__data) {
-        for (const item of __data) {
-          const row = document.createElement("tr");
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    const __data = data.data;
+    assistants = __data;
+    console.log("_____________________");
+    console.log(__data);
+    chrome.storage.local.set({ streams_table: assistants });
+    if (__data) {
+      for (const item of __data) {
+        const row = document.createElement("tr");
 
-          const nameCell = document.createElement("td");
-          nameCell.textContent = item.name;
+        const nameCell = document.createElement("td");
+        nameCell.textContent = item.name;
 
-          const instructionCell = document.createElement("td");
-          instructionCell.textContent = item.instructions;
+        const instructionCell = document.createElement("td");
+        instructionCell.textContent = item.instructions;
 
-          const actionsCell = document.createElement("td");
-          // Create edit and delete buttons in the last cell
-          // The actual implementation details for editing/removing should be defined
-          // For example, the remove_key and table_stream.deleteRow functions are placeholders here
+        const actionsCell = document.createElement("td");
+        // Create edit and delete buttons in the last cell
+        // The actual implementation details for editing/removing should be defined
+        // For example, the remove_key and table_stream.deleteRow functions are placeholders here
 
-          const editButton = document.createElement("button");
-          editButton.className = "btn btn-success";
-          editButton.textContent = "Edit";
-          editButton.style = "margin-left:10px; margin-right:10px";
-          editButton.addEventListener("click", function () {
-            streamInput.value = nameCell.textContent;
-            streamInput.disabled = true;
-            instructionInput.value = instructionCell.textContent;
-            selectedRow = row;
-          });
-          const deleteButton = document.createElement("button");
-          deleteButton.className = "btn btn-danger";
-          deleteButton.textContent = "Delete";
-          deleteButton.addEventListener("click", function () {
-            const toDel = row.querySelector("td").textContent;
-            console.log(toDel);
-            const asstId = findAssistantId(toDel);
-            console.log(asstId);
-            fetch("http://127.0.0.1:5000/openai/assistants/delete", {
-              method: "DELETE",
-              headers: { "content-type": "application/json" },
-              body: JSON.stringify({
-                asstid: asstId,
-              }),
+        const editButton = document.createElement("button");
+        editButton.className = "btn btn-success";
+        editButton.textContent = "Edit";
+        editButton.style = "margin-left:10px; margin-right:10px";
+        editButton.addEventListener("click", function () {
+          streamInput.value = nameCell.textContent;
+          streamInput.disabled = true;
+          instructionInput.value = instructionCell.textContent;
+          selectedRow = row;
+        });
+        const deleteButton = document.createElement("button");
+        deleteButton.className = "btn btn-danger";
+        deleteButton.textContent = "Delete";
+        deleteButton.addEventListener("click", function () {
+          const toDel = row.querySelector("td").textContent;
+          console.log(toDel);
+          const asstId = findAssistantId(toDel);
+          console.log(asstId);
+          fetch("http://136.243.150.17:5000/openai/assistants/delete", {
+            method: "DELETE",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+              asstid: asstId,
+            }),
+          })
+            .then((response) => response.text())
+            .then((data) => {
+              console.log(data);
+              if (data === "deleted") {
+                console.log("DELETING TABLE");
+                table_stream.deleteRow(row.rowIndex);
+              } else {
+                console.log("Not found: ", asstId);
+              }
             })
-              .then((response) => response.text())
-              .then((data) => {
-                console.log(data);
-                if (data === "deleted") {
-                  console.log("DELETING TABLE");
-                  table_stream.deleteRow(row.rowIndex);
-                } else {
-                  console.log("Not found: ", asstId);
-                }
-              })
-              .catch((error) => {
-                console.log(error);
-              });
-          });
+            .catch((error) => {
+              console.log(error);
+            });
+        });
 
-          actionsCell.appendChild(editButton);
-          actionsCell.appendChild(deleteButton);
+        actionsCell.appendChild(editButton);
+        actionsCell.appendChild(deleteButton);
 
-          row.appendChild(nameCell);
-          row.appendChild(instructionCell);
-          row.appendChild(actionsCell);
-          // Assuming table_stream is a reference to a <table> element on your page
-          table_stream.appendChild(row);
-        }
+        row.appendChild(nameCell);
+        row.appendChild(instructionCell);
+        row.appendChild(actionsCell);
+        // Assuming table_stream is a reference to a <table> element on your page
+        table_stream.appendChild(row);
       }
-    })
-    .catch((err) => {
-      console.error("Fetch Error:", err);
-    });
+    }
+  } catch (error) {
+    console.error("Error fetching data from openai assistants:", error);
+  }
 }
 
 fetchDataFromAPI();
@@ -296,7 +301,7 @@ form_stream.addEventListener("submit", async function (e) {
       "assist-name": stream,
       "assist-type": "code_interpreter",
     };
-    fetch("http://127.0.0.1:5000/openai/assistants/modify", {
+    fetch("http://136.243.150.17:5000/openai/assistants/modify", {
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -313,15 +318,16 @@ form_stream.addEventListener("submit", async function (e) {
         console.error("Error:", error); // Handle any errors
       });
   } else {
-    if (findAssistantId(stream).length > 0) {
-      alert("stream already exist!");
-
+    console.log("testing existing streams.", stream);
+    console.log(findAssistantId(stream));
+    if (!findAssistantId(stream).startsWith("default") > 0) {
+      alert("Stream already exist!");
       streamInput.value = "";
       instructionInput.value = "";
       return;
     }
     // Make the POST request using fetch
-    fetch("http://127.0.0.1:5000/openai/assistants/create", {
+    fetch("http://136.243.150.17:5000/openai/assistants/create", {
       method: "POST",
       headers: {
         "content-type": "application/json",
@@ -366,7 +372,7 @@ form_stream.addEventListener("submit", async function (e) {
           console.log(toDel);
           const asstId = findAssistantId(toDel);
           console.log(asstId);
-          fetch("http://127.0.0.1:5000/openai/assistants/delete", {
+          fetch("http://136.243.150.17:5000/openai/assistants/delete", {
             method: "DELETE",
             headers: { "content-type": "application/json" },
             body: JSON.stringify({
@@ -471,7 +477,7 @@ function add_key_value(prompt, description, table_name) {
     .then((res) => {
       jsonData = res;
       let data = {};
-      console.log("local jsonData: ", jsonData);
+      // console.log("local jsonData: ", jsonData);
       if (jsonData && table_name == "prompts_table") {
         // Parse the JSON data into a JavaScript object
         try {
@@ -485,12 +491,14 @@ function add_key_value(prompt, description, table_name) {
       data[prompt] = description;
       // Convert the updated object back to JSON format
       const updatedJsonData = JSON.stringify(data);
-      console.log("updated jsonData: ", updatedJsonData);
+      // console.log("updated jsonData: ", updatedJsonData);
       // Save the updated JSON data to local storage
       if (table_name == "prompts_table") {
         chrome.storage.local.set({ prompts_table: updatedJsonData });
       } else if (table_name == "streams_table") {
         chrome.storage.local.set({ streams_table: updatedJsonData });
+      } else {
+        chrome.storage.local.set({ openai_thdid: updatedJsonData });
       }
     })
     .catch((err) => {

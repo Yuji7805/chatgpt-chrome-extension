@@ -831,7 +831,7 @@ submitButton.addEventListener("click", async () => {
   console.log(asstId);
   let gptAnswer = "data";
   try {
-    fetch("http://127.0.0.1:5000/openai/run", {
+    fetch("http://136.243.150.17:5000/openai/run", {
       method: "POST",
       headers: {
         "content-type": "application/json",
