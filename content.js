@@ -829,8 +829,8 @@ submitButton.addEventListener("click", async () => {
   console.log(content);
   console.log(thdid);
   console.log(asstId);
-  if (asstId == undefined) {
-    alsert("Please select Stream");
+  if (asstId == undefined || !asstId) {
+    alert("Please select Stream");
     return;
   }
   if (thdid == undefined) {
@@ -1136,6 +1136,7 @@ function showInputFields(e) {
       insertBox.style.top = `${currentPosY - 270}px`;
     }
   }
+  query_input.style.height = "auto";
   document.body.appendChild(insertBox);
   insertBox.style.display = "block";
   selectedText = "";
