@@ -825,26 +825,41 @@ submitButton.addEventListener("click", async () => {
   messageArray.push({ role: "user", content: message });
   var asstId = findAssistantId();
   var content = query_input.value;
-  var thdid = thdId;
+  var thdid = JSON.parse(thdId)["openai_thdid"];
   console.log(content);
   console.log(thdid);
   console.log(asstId);
+  if (asstId == undefined) {
+    alsert("Please select Stream");
+    return;
+  }
+  if (thdid == undefined) {
+    alert("An error occured.\nPlease reinstall the extension.");
+    return;
+  }
+  if (content == undefined) {
+    alert("You didn't select any text.");
+    return;
+  }
   let gptAnswer = "data";
   try {
     fetch("https://main-monster-decent.ngrok-free.app/openai/run", {
       method: "POST",
       headers: {
-        "content-type": "application/json",
-        // "Access-Control-Allow-Origin": "https://web.telegram.org",
-        // "Access-Control-Allow-Headers": "Content-Type",
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        thdid: thdId,
+        thdid: thdid,
         asstid: asstId,
         content: content,
       }),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      })
       .then((data) => {
         // Handle the response data here
         console.log(data);
@@ -855,7 +870,6 @@ submitButton.addEventListener("click", async () => {
         answer.innerHTML = answerWithBreaks;
       })
       .catch((error) => {
-        // Handle any errors here
         console.error("Error:", error);
       });
 
@@ -936,16 +950,6 @@ submitButton.addEventListener("click", async () => {
     timestamp.innerText = time;
 
     loadingIndicator.style.display = "none";
-
-    // const query = query_input.value;
-
-    // chrome.storage.local.get({ queriesAnswers: [] }, ({ queriesAnswers }) => {
-    //   queriesAnswers.push({ query, gptAnswer, timeStamp: time });
-
-    //   chrome.storage.local.set({ queriesAnswers }, () => {
-    //     console.log("queriesAnswers array updated");
-    //   });
-    // });
   } catch (error) {
     console.log(error);
 
@@ -954,88 +958,6 @@ submitButton.addEventListener("click", async () => {
 
     loadingIndicator.style.display = "none";
   }
-
-  // chrome.storage.local.get(["queriesAnswers"], ({ queriesAnswers }) => {
-  //   if (!queriesAnswers || queriesAnswers.length === 0) {
-  //     return;
-  //   }
-
-  //   queriesAnswers = queriesAnswers.reverse();
-
-  //   if (queriesAnswers.length > 0) {
-  //     showHideWrapper.style.display = "flex";
-
-  //     queriesAnswersContainer.innerHTML = "";
-
-  //     queriesAnswers.forEach(({ query, tmpAnswer, timeStamp }, i) => {
-  //       const answerWithBreaks = tmpAnswer.replace(/\n/g, "<br>");
-
-  //       const item = document.createElement("div");
-  //       item.className = "queriesAnswers";
-
-  //       item.style.marginBottom =
-  //         i < queriesAnswers.length - 1 ? "0.5rem" : "0";
-
-  //       const removeButton = `<button id=removeButton${i} class="btn removeButton" title="Remove this query and answer from the list"><i class="fa fa-trash"></i></button>`;
-
-  //       const copyButton = `<button id=copyLastAnswer${i} class="btn copyButton" title="Copy the Answer to the Clipboard"><i class="fa fa-copy" style="font-size: small"></i></button>`;
-  //       const insertButton = `<button id=copyLastAnswer${i} class="btn insertButton" title="Insert the Answer to the edit"><i class="fa-sharp fa-light fa-paste" style="color: #090101;"></i></button>`;
-
-  //       const options = {
-  //         month: "short",
-  //         day: "2-digit",
-  //         hour: "2-digit",
-  //         minute: "2-digit",
-  //         second: "2-digit",
-  //       };
-  //       const time = new Date().toLocaleString("en-US", options);
-  //       const timeStampElem = `<div class="timeStamp">${
-  //         timeStamp || time
-  //       }</div>`;
-
-  //       item.innerHTML = `
-  //         <div style="color: rgb(188, 188, 188); margin-bottom: 0.2rem;">${query}</div>
-  //         <div>${answerWithBreaks}</div>
-  //         <div class="copyRow">
-  //           ${timeStampElem}
-  //           <div>${removeButton}${copyButton}${insertButton}</div>
-  //         </div>
-  //       `;
-
-  //       queriesAnswersContainer.appendChild(item);
-
-  //       document
-  //         .getElementById(`removeButton${i}`)
-  //         .addEventListener("click", () => {
-  //           queriesAnswers.splice(i, 1);
-
-  //           chrome.storage.local.set({ queriesAnswers }, () => {
-  //             console.log("queriesAnswers array updated");
-  //           });
-
-  //           item.remove();
-
-  //           if (queriesAnswers.length === 0) {
-  //             showHideWrapper.style.display = "none";
-  //             queriesAnswersContainer.style.display = "none";
-  //           }
-  //         });
-
-  //       document
-  //         .getElementById(`copyLastAnswer${i}`)
-  //         .addEventListener("click", () => {
-  //           const answerText = answer;
-
-  //           navigator.clipboard
-  //             .writeText(answerText)
-  //             .then(() => console.log("Answer text copied to clipboard"))
-  //             .catch((err) => console.error("Could not copy text: ", err));
-  //         });
-  //     });
-  //   } else {
-  //     showHideWrapper.style.display = "none";
-  //   }
-  // });
 });
 
 function checkPrompt(prompt_question) {
