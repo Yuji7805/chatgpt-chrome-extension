@@ -100,24 +100,34 @@ getFromChromeStorage("prompts_table")
 async function makeThread() {
   var thdId = "";
   thdId = await getFromChromeStorage("openai_thdid");
-  thdId = JSON.parse(thdId);
-  if (!String(thdId["openai_thdid"]).startsWith("thread_")) {
-    fetch("https://main-monster-decent.ngrok-free.app/openai/threads/create", {
-      method: "POST",
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        thdId = data["thdid"];
-        console.log("thread created. ", thdId);
-        add_key_value("openai_thdid", thdId, "openai_thdid");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  } else {
-    console.log("using existing thread.", thdId["openai_thdid"]);
+  let thread_exist;
+  try {
+    thdId = JSON.parse(thdId);
+    thread_exist = String(thdId["openai_thdid"]).startsWith("thread_");
+    if (thread_exist) {
+      console.log("using existing thread.", thdId["openai_thdid"]);
+    }
+  } catch {
+    if (!thread_exist || thdId == undefined) {
+      fetch(
+        "https://main-monster-decent.ngrok-free.app/openai/threads/create",
+        {
+          method: "POST",
+        }
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          thdId = data["thdid"];
+          console.log("thread created. ", thdId);
+          add_key_value("openai_thdid", thdId, "openai_thdid");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   }
 }
+
 makeThread();
 
 async function fetchDataFromAPI() {
@@ -126,92 +136,87 @@ async function fetchDataFromAPI() {
   chrome.storage.local.set({ streams_table: {} });
   console.log("fetching data from openai assistants");
   try {
-    const response = await fetch(
-      "https://main-monster-decent.ngrok-free.app/openai/assistants",
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-        },
-      }
-    );
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    console.log(response);
-    const data = await response.json();
-    const __data = data.data;
-    assistants = __data;
-    console.log("_____________________");
-    console.log(__data);
-    chrome.storage.local.set({ streams_table: assistants });
-    if (__data) {
-      for (const item of __data) {
-        const row = document.createElement("tr");
+    fetch("https://main-monster-decent.ngrok-free.app/openai/assistants", {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        assistants = data.data;
+        console.log(data); // Process the parsed JSON data here
+        const __data = assistants;
+        console.log("_____________________");
+        console.log(__data);
+        chrome.storage.local.set({ streams_table: assistants });
+        if (__data) {
+          for (const item of __data) {
+            const row = document.createElement("tr");
 
-        const nameCell = document.createElement("td");
-        nameCell.textContent = item.name;
+            const nameCell = document.createElement("td");
+            nameCell.textContent = item.name;
 
-        const instructionCell = document.createElement("td");
-        instructionCell.textContent = item.instructions;
+            const instructionCell = document.createElement("td");
+            instructionCell.textContent = item.instructions;
 
-        const actionsCell = document.createElement("td");
-        // Create edit and delete buttons in the last cell
-        // The actual implementation details for editing/removing should be defined
-        // For example, the remove_key and table_stream.deleteRow functions are placeholders here
-
-        const editButton = document.createElement("button");
-        editButton.className = "btn btn-success";
-        editButton.textContent = "Edit";
-        editButton.style = "margin-left:10px; margin-right:10px";
-        editButton.addEventListener("click", function () {
-          streamInput.value = nameCell.textContent;
-          streamInput.disabled = true;
-          instructionInput.value = instructionCell.textContent;
-          selectedRow = row;
-        });
-        const deleteButton = document.createElement("button");
-        deleteButton.className = "btn btn-danger";
-        deleteButton.textContent = "Delete";
-        deleteButton.addEventListener("click", function () {
-          const toDel = row.querySelector("td").textContent;
-          console.log(toDel);
-          const asstId = findAssistantId(toDel);
-          console.log(asstId);
-          fetch(
-            "https://main-monster-decent.ngrok-free.app/openai/assistants/delete",
-            {
-              method: "DELETE",
-              headers: { "content-type": "application/json" },
-              body: JSON.stringify({
-                asstid: asstId,
-              }),
-            }
-          )
-            .then((response) => response.text())
-            .then((data) => {
-              console.log(data);
-              if (data === "deleted") {
-                console.log("DELETING TABLE");
-                table_stream.deleteRow(row.rowIndex);
-              } else {
-                console.log("Not found: ", asstId);
-              }
-            })
-            .catch((error) => {
-              console.log(error);
+            const actionsCell = document.createElement("td");
+            const editButton = document.createElement("button");
+            editButton.className = "btn btn-success";
+            editButton.textContent = "Edit";
+            editButton.style = "margin-left:10px; margin-right:10px";
+            editButton.addEventListener("click", function () {
+              streamInput.value = nameCell.textContent;
+              streamInput.disabled = true;
+              instructionInput.value = instructionCell.textContent;
+              selectedRow = row;
             });
-        });
+            const deleteButton = document.createElement("button");
+            deleteButton.className = "btn btn-danger";
+            deleteButton.textContent = "Delete";
+            deleteButton.addEventListener("click", function () {
+              const toDel = row.querySelector("td").textContent;
+              console.log(toDel);
+              const asstId = findAssistantId(toDel);
+              console.log(asstId);
+              fetch(
+                "https://main-monster-decent.ngrok-free.app/openai/assistants/delete",
+                {
+                  method: "DELETE",
+                  headers: { "content-type": "application/json" },
+                  body: JSON.stringify({
+                    asstid: asstId,
+                  }),
+                }
+              )
+                .then((response) => response.text())
+                .then((data) => {
+                  console.log(data);
+                  if (data === "deleted") {
+                    console.log("DELETING TABLE");
+                    table_stream.deleteRow(row.rowIndex);
+                  } else {
+                    console.log("Not found: ", asstId);
+                  }
+                })
+                .catch((error) => {
+                  console.log(error);
+                });
+            });
 
-        actionsCell.appendChild(editButton);
-        actionsCell.appendChild(deleteButton);
+            actionsCell.appendChild(editButton);
+            actionsCell.appendChild(deleteButton);
 
-        row.appendChild(nameCell);
-        row.appendChild(instructionCell);
-        row.appendChild(actionsCell);
-        table_stream.appendChild(row);
-      }
-    }
+            row.appendChild(nameCell);
+            row.appendChild(instructionCell);
+            row.appendChild(actionsCell);
+            table_stream.appendChild(row);
+          }
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
   } catch (error) {
     console.error("Error fetching data from openai assistants:", error);
   }
