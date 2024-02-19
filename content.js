@@ -86,6 +86,7 @@ p {
 
 #query-input {
 	margin-left: 4px;
+  min-height: 45px;
 	border: 1px solid #ccc;
 	border-radius: 4px;  
 	white-space: normal;
@@ -713,6 +714,13 @@ query_input.addEventListener("keyup", (event) => {
   }
 });
 
+function adjustHeight() {
+  console.log("adjusting...");
+  query_input.style.height = "auto";
+  query_input.style.height = query_input.scrollHeight + "px";
+  console.log(query_input.scrollHeight);
+}
+
 const stage = document.createElement("div");
 stage.id = "stage";
 
@@ -817,18 +825,13 @@ getFromChromeStorage("openai_thdid")
 //click answer button
 submitButton.addEventListener("click", async () => {
   const message = query_input.value;
-
-  answer.innerHTML = "";
-  answerWrapper.style.display = "none";
-  loadingIndicator.style.display = "block";
-
   messageArray.push({ role: "user", content: message });
   var asstId = findAssistantId();
   var content = query_input.value;
   var thdid = JSON.parse(thdId)["openai_thdid"];
-  console.log(content);
-  console.log(thdid);
-  console.log(asstId);
+  // console.log(content);
+  // console.log(thdid);
+  // console.log(asstId);
   if (asstId == undefined || !asstId) {
     alert("Please select Stream");
     return;
@@ -843,6 +846,10 @@ submitButton.addEventListener("click", async () => {
   }
   let gptAnswer = "data";
   try {
+    answer.innerHTML = "";
+    answerWrapper.style.display = "none";
+    loadingIndicator.style.display = "block";
+    
     fetch("https://main-monster-decent.ngrok-free.app/openai/run", {
       method: "POST",
       headers: {
@@ -1136,10 +1143,10 @@ function showInputFields(e) {
       insertBox.style.top = `${currentPosY - 270}px`;
     }
   }
-  query_input.style.height = "auto";
   document.body.appendChild(insertBox);
   insertBox.style.display = "block";
   selectedText = "";
+  adjustHeight();
 }
 
 // hide UI when iconImage clicked
@@ -1172,6 +1179,7 @@ floatingButton.addEventListener("click", function (event) {
   isDown = false;
   showOrHide = !showOrHide;
   console.log(showOrHide);
+  adjustHeight();
   if (showOrHide == true) {
     showInputFields(event);
     hideFloatingButton();
