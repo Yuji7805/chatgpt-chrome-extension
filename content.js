@@ -715,10 +715,8 @@ query_input.addEventListener("keyup", (event) => {
 });
 
 function adjustHeight() {
-  console.log("adjusting...");
   query_input.style.height = "auto";
   query_input.style.height = query_input.scrollHeight + "px";
-  console.log(query_input.scrollHeight);
 }
 
 const stage = document.createElement("div");
@@ -845,15 +843,15 @@ submitButton.addEventListener("click", async () => {
     return;
   }
   let gptAnswer = "data";
+  answer.innerHTML = "";
+  answerWrapper.style.display = "none";
+  loadingIndicator.style.display = "block";
   try {
-    answer.innerHTML = "";
-    answerWrapper.style.display = "none";
-    loadingIndicator.style.display = "block";
-    
     fetch("https://main-monster-decent.ngrok-free.app/openai/run", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
       },
       body: JSON.stringify({
         thdid: thdid,
@@ -1125,10 +1123,12 @@ insertBox.appendChild(answerWrapper);
 function showInputFields(e) {
   query_input.focus();
   if (!topChecked) {
-    console.log(localStorage.getItem("selectedText"));
-    if (localStorage.getItem("selectedText").length > 0) {
-      query_input.value =
-        prompt_question + localStorage.getItem("selectedText");
+    const selectedText = localStorage.getItem("selectedText");
+    if (selectedText.length > 0) {
+      if (selectedText.length > 6000) {
+        alert("Selected text is over limit.\nText is limited now.");
+      }
+      query_input.value = prompt_question + selectedText.slice(0, 6000);
       submitButton.disabled = false;
     }
     insertBox.style.left = `${currentPosX - 375}px`;
