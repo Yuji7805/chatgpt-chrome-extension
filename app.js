@@ -153,7 +153,7 @@ async function makeThread() {
   thdId = await getFromChromeStorage("openai_thdid");
   thdId = JSON.parse(thdId);
   if (!String(thdId["openai_thdid"]).startsWith("thread_")) {
-    fetch("http://136.243.150.17:5000/openai/threads/create", {
+    fetch("https://main-monster-decent.ngrok-free.app/openai/threads/create", {
       method: "POST",
     })
       .then((response) => response.json())
@@ -181,17 +181,18 @@ async function fetchDataFromAPI() {
   console.log("fetching data from openai assistants");
   try {
     const response = await fetch(
-      "http://136.243.150.17:5000/openai/assistants",
+      "https://main-monster-decent.ngrok-free.app/openai/assistants",
       {
         method: "GET",
         headers: {
-          "content-type": "application/json",
+          Accept: "application/json",
         },
       }
     );
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
+    console.log(response);
     const data = await response.json();
     const __data = data.data;
     assistants = __data;
@@ -231,13 +232,16 @@ async function fetchDataFromAPI() {
           console.log(toDel);
           const asstId = findAssistantId(toDel);
           console.log(asstId);
-          fetch("http://136.243.150.17:5000/openai/assistants/delete", {
-            method: "DELETE",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({
-              asstid: asstId,
-            }),
-          })
+          fetch(
+            "https://main-monster-decent.ngrok-free.app/openai/assistants/delete",
+            {
+              method: "DELETE",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({
+                asstid: asstId,
+              }),
+            }
+          )
             .then((response) => response.text())
             .then((data) => {
               console.log(data);
@@ -301,13 +305,16 @@ form_stream.addEventListener("submit", async function (e) {
       "assist-name": stream,
       "assist-type": "code_interpreter",
     };
-    fetch("http://136.243.150.17:5000/openai/assistants/modify", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(_data_To_Modify_Assistant),
-    })
+    fetch(
+      "https://main-monster-decent.ngrok-free.app/openai/assistants/modify",
+      {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(_data_To_Modify_Assistant),
+      }
+    )
       .then((data) => {
         console.log(data);
         selectedRow.cells[0].textContent = stream;
@@ -327,13 +334,16 @@ form_stream.addEventListener("submit", async function (e) {
       return;
     }
     // Make the POST request using fetch
-    fetch("http://136.243.150.17:5000/openai/assistants/create", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(_data_To_Create_Assistant), // Convert the data object to a JSON string
-    })
+    fetch(
+      "https://main-monster-decent.ngrok-free.app/openai/assistants/create",
+      {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify(_data_To_Create_Assistant), // Convert the data object to a JSON string
+      }
+    )
       // .then((response) => response.json()) // Parse the JSON response
       .then((data) => {
         console.log("successed to create an assistant: ", stream);
@@ -372,13 +382,16 @@ form_stream.addEventListener("submit", async function (e) {
           console.log(toDel);
           const asstId = findAssistantId(toDel);
           console.log(asstId);
-          fetch("http://136.243.150.17:5000/openai/assistants/delete", {
-            method: "DELETE",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({
-              asstid: asstId,
-            }),
-          })
+          fetch(
+            "https://main-monster-decent.ngrok-free.app/openai/assistants/delete",
+            {
+              method: "DELETE",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({
+                asstid: asstId,
+              }),
+            }
+          )
             .then((response) => response.text())
             .then((data) => {
               console.log(data);
