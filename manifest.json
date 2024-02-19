@@ -1,6 +1,6 @@
 {
-  "name": "ChatGPT extension 20240219.003",
-  "version": "1.0",
+  "name": "ChatGPT extension",
+  "version": "20240219.003",
   "manifest_version": 3,
   "default_locale": "en",
   "permissions": ["storage", "tabs", "management"],
