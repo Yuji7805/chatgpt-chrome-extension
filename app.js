@@ -100,24 +100,34 @@ getFromChromeStorage("prompts_table")
 async function makeThread() {
   var thdId = "";
   thdId = await getFromChromeStorage("openai_thdid");
-  thdId = JSON.parse(thdId);
-  if (!String(thdId["openai_thdid"]).startsWith("thread_")) {
-    fetch("https://main-monster-decent.ngrok-free.app/openai/threads/create", {
-      method: "POST",
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        thdId = data["thdid"];
-        console.log("thread created. ", thdId);
-        add_key_value("openai_thdid", thdId, "openai_thdid");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  } else {
-    console.log("using existing thread.", thdId["openai_thdid"]);
+  let thread_exist;
+  try {
+    thdId = JSON.parse(thdId);
+    thread_exist = String(thdId["openai_thdid"]).startsWith("thread_");
+    if (thread_exist) {
+      console.log("using existing thread.", thdId["openai_thdid"]);
+    }
+  } catch {
+    if (!thread_exist || thdId == undefined) {
+      fetch(
+        "https://main-monster-decent.ngrok-free.app/openai/threads/create",
+        {
+          method: "POST",
+        }
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          thdId = data["thdid"];
+          console.log("thread created. ", thdId);
+          add_key_value("openai_thdid", thdId, "openai_thdid");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   }
 }
+
 makeThread();
 
 async function fetchDataFromAPI() {
