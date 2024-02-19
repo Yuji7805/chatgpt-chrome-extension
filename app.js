@@ -158,14 +158,11 @@ async function makeThread() {
     })
       .then((response) => response.json())
       .then((data) => {
-        // Handle the response data here
         thdId = data["thdid"];
         console.log("thread created. ", thdId);
-        // chrome.storage.local.set({ openai_thdid: thdId });
         add_key_value("openai_thdid", thdId, "openai_thdid");
       })
       .catch((error) => {
-        // Handle any errors here
         console.log(error);
       });
   } else {
@@ -263,7 +260,6 @@ async function fetchDataFromAPI() {
         row.appendChild(nameCell);
         row.appendChild(instructionCell);
         row.appendChild(actionsCell);
-        // Assuming table_stream is a reference to a <table> element on your page
         table_stream.appendChild(row);
       }
     }
@@ -290,7 +286,6 @@ form_stream.addEventListener("submit", async function (e) {
 
   streamInput.disabled = false;
 
-  // Create the data object
   const _data_To_Create_Assistant = {
     instruction: instruction,
     "assist-name": stream,
@@ -298,7 +293,6 @@ form_stream.addEventListener("submit", async function (e) {
   };
   if (selectedRow) {
     console.log("modifying....");
-    // Update the selected row with the new values
     const _data_To_Modify_Assistant = {
       asstid: findAssistantId(stream),
       instruction: instruction,
@@ -344,14 +338,9 @@ form_stream.addEventListener("submit", async function (e) {
         body: JSON.stringify(_data_To_Create_Assistant), // Convert the data object to a JSON string
       }
     )
-      // .then((response) => response.json()) // Parse the JSON response
       .then((data) => {
         console.log("successed to create an assistant: ", stream);
         console.log(data); // Log the response data
-        // if (selectedRow) {
-
-        // } else {
-        // Create a new row in the table
         const row = table_stream.insertRow(-1);
 
         // Insert cells with the stream
