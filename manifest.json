@@ -20,11 +20,7 @@
     "default_popup": "popup.html"
   },
   "options_page": "options.html",
-  "host_permissions": [
-    "https://api.openai.com/v1/completions",
-    "https://main-monster-decent.ngrok-free.app/*",
-    "https://main-monster-decent.ngrok-free.app/openai/assistants"
-  ],
+  "host_permissions": ["https://api.openai.com/v1/completions"],
   "background": {
     "service_worker": "background.js"
   }
