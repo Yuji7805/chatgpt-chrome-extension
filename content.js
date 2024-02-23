@@ -576,7 +576,7 @@ const inputContainer = document.createElement("div");
 // red A! icon at the left of extension dialog
 const imageIcon = document.createElement("div");
 imageIcon.innerHTML =
-  "<img id = 'imageicon' width='40px' height='40px' src='https://i.ibb.co/W0CvvZV/icon2.png' alt='animal' display = 'block'>";
+  "<img id = 'imageicon' width='40px' height='40px' style='cursor:pointer' src='https://i.ibb.co/W0CvvZV/icon2.png' alt='animal' display = 'block'>";
 inputContainer.appendChild(imageIcon);
 
 inputContainer.classList.add("input-container", "form-group");
