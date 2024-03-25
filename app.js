@@ -204,8 +204,10 @@ async function fetchDataFromAPI() {
                 });
             });
 
-            actionsCell.appendChild(editButton);
-            actionsCell.appendChild(deleteButton);
+            if (item.name !== "Default") {
+              actionsCell.appendChild(editButton);
+              actionsCell.appendChild(deleteButton);
+            }
 
             row.appendChild(nameCell);
             row.appendChild(instructionCell);
@@ -215,6 +217,16 @@ async function fetchDataFromAPI() {
         }
       })
       .catch((error) => {
+        var siteLink = "https://main-monster-decent.ngrok-free.app"; // Replace with your site link
+
+        if (
+          window.confirm(
+            "Did you log in to the site?\nClick OK to visit the site: " +
+              siteLink
+          )
+        ) {
+          window.open(siteLink, "_blank");
+        }
         console.error("Error fetching data:", error);
       });
   } catch (error) {
@@ -281,6 +293,7 @@ form_stream.addEventListener("submit", async function (e) {
       instructionInput.value = "";
       return;
     }
+    console.log(_data_To_Create_Assistant);
     // Make the POST request using fetch
     fetch(
       "https://main-monster-decent.ngrok-free.app/openai/assistants/create",

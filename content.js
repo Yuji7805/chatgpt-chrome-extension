@@ -576,7 +576,7 @@ const inputContainer = document.createElement("div");
 // red A! icon at the left of extension dialog
 const imageIcon = document.createElement("div");
 imageIcon.innerHTML =
-  "<img id = 'imageicon' width='40px' height='40px' src='https://i.ibb.co/W0CvvZV/icon2.png' alt='animal' display = 'block'>";
+  "<img id = 'imageicon' width='40px' height='40px' style='cursor:pointer' src='https://i.ibb.co/W0CvvZV/icon2.png' alt='animal' display = 'block'>";
 inputContainer.appendChild(imageIcon);
 
 inputContainer.classList.add("input-container", "form-group");
@@ -617,8 +617,8 @@ getFromChromeStorage("streams_table")
       // Parse the JSON data into a JavaScript object
       try {
         var optionElement = document.createElement("option"); // Create an option element
-        optionElement.value = "SELECT_STREAM"; // Set the value of the option to the key
-        optionElement.textContent = "SELECT_STREAM"; // Set the text content of the option to the key
+        optionElement.value = "Default"; // Set the value of the option to the key
+        optionElement.textContent = "Default"; // Set the text content of the option to the key
         stream_select.appendChild(optionElement);
         for (var asstIdx in res) {
           console.log("$$$ " + res[asstIdx]["name"]);
