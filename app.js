@@ -7,6 +7,10 @@ function findAssistantId(asstname) {
         asstId = assistants[asstIdx]["id"];
       }
     }
+  } else {
+    if (asstname === "Default") {
+      asstId = assistants[asstIdx]["id"];
+    }
   }
   return asstId;
 }

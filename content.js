@@ -613,13 +613,13 @@ getFromChromeStorage("streams_table")
   .then((res) => {
     console.log("from storage: ", res);
     assistants = res;
+    var optionElement = document.createElement("option"); // Create an option element
+    optionElement.value = "SELECT_STREAM"; // Set the value of the option to the key
+    optionElement.textContent = "SELECT_STREAM"; // Set the text content of the option to the key
+    stream_select.appendChild(optionElement);
     if (res) {
       // Parse the JSON data into a JavaScript object
       try {
-        var optionElement = document.createElement("option"); // Create an option element
-        optionElement.value = "Default"; // Set the value of the option to the key
-        optionElement.textContent = "Default"; // Set the text content of the option to the key
-        stream_select.appendChild(optionElement);
         for (var asstIdx in res) {
           console.log("$$$ " + res[asstIdx]["name"]);
           var optionElement = document.createElement("option"); // Create an option element
@@ -641,14 +641,14 @@ getFromChromeStorage("prompts_table")
   .then((res) => {
     console.log("from storage: ", res);
     _jsonData = res;
+    var optionElement = document.createElement("option"); // Create an option element
+    optionElement.value = "SELECT_PROMPT"; // Set the value of the option to the key
+    optionElement.textContent = "SELECT_PROMPT"; // Set the text content of the option to the key
+    prompt_select.appendChild(optionElement);
     if (_jsonData) {
       // Parse the JSON data into a JavaScript object
       try {
         _data = JSON.parse(_jsonData) || {};
-        var optionElement = document.createElement("option"); // Create an option element
-        optionElement.value = "SELECT_PROMPT"; // Set the value of the option to the key
-        optionElement.textContent = "SELECT_PROMPT"; // Set the text content of the option to the key
-        prompt_select.appendChild(optionElement);
         for (var key in _data) {
           if (_data.hasOwnProperty(key)) {
             var optionElement = document.createElement("option"); // Create an option element
@@ -804,6 +804,10 @@ function findAssistantId() {
       if (asstname === assistants[asstIdx]["name"]) {
         asstId = assistants[asstIdx]["id"];
       }
+    }
+  } else {
+    if (asstname === "Default") {
+      asstId = assistants[asstIdx]["id"];
     }
   }
   return asstId;
