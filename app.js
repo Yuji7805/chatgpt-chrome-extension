@@ -22,7 +22,6 @@ async function getFromChromeStorage(key) {
       chrome.storage.local.get([key], (result) => ree(result.openai_thdid));
     }
   });
-  // console.log("via function: ", request);
   return request;
 }
 
@@ -145,7 +144,6 @@ async function fetchDataFromAPI() {
       .then((response) => response.json())
       .then((data) => {
         assistants = data.data;
-        console.log(data); // Process the parsed JSON data here
         const __data = assistants;
         console.log("_____________________");
         console.log(__data);
@@ -217,7 +215,7 @@ async function fetchDataFromAPI() {
         }
       })
       .catch((error) => {
-        var siteLink = "https://main-monster-decent.ngrok-free.app"; // Replace with your site link
+        var siteLink = "https://main-monster-decent.ngrok-free.app";
 
         if (
           window.confirm(
@@ -243,7 +241,7 @@ let __data = {};
 
 // Add event listener to the (add stream)form submit event
 form_stream.addEventListener("submit", async function (e) {
-  e.preventDefault(); // Prevent form submission
+  e.preventDefault();
 
   const streamInput = document.getElementById("stream");
   const stream = streamInput.value;
@@ -282,7 +280,7 @@ form_stream.addEventListener("submit", async function (e) {
         selectedRow = null;
       })
       .catch((error) => {
-        console.error("Error:", error); // Handle any errors
+        console.error("Error:", error);
       });
   } else {
     console.log("testing existing streams.", stream);
@@ -302,12 +300,12 @@ form_stream.addEventListener("submit", async function (e) {
         headers: {
           "content-type": "application/json",
         },
-        body: JSON.stringify(_data_To_Create_Assistant), // Convert the data object to a JSON string
+        body: JSON.stringify(_data_To_Create_Assistant),
       }
     )
       .then((data) => {
         console.log("successed to create an assistant: ", stream);
-        console.log(data); // Log the response data
+        console.log(data);
         const row = table_stream.insertRow(-1);
 
         // Insert cells with the stream
@@ -366,12 +364,11 @@ form_stream.addEventListener("submit", async function (e) {
         const actionsCell = row.insertCell(2);
         actionsCell.appendChild(editButton);
         actionsCell.appendChild(deleteButton);
-        // }
         // save stream name and instruction
         add_key_value(stream, instruction, "streams_table");
       })
       .catch((error) => {
-        console.error("Error:", error); // Handle any errors
+        console.error("Error:", error);
       });
   }
   // Clear the form inputs
@@ -381,7 +378,7 @@ form_stream.addEventListener("submit", async function (e) {
 
 // Add event listener to the form submit event(prompt add)
 form.addEventListener("submit", function (e) {
-  e.preventDefault(); // Prevent form submission
+  e.preventDefault();
 
   const promptInput = document.getElementById("prompt");
   const descriptionInput = document.getElementById("description");
@@ -392,22 +389,18 @@ form.addEventListener("submit", function (e) {
 
   add_key_value(prompt, description, "prompts_table");
   if (selectedRow) {
-    // Update the selected row with the new values
     selectedRow.cells[0].textContent = prompt;
     selectedRow.cells[1].textContent = description;
     selectedRow = null;
   } else {
-    // Create a new row in the table
     const row = table.insertRow(-1);
 
-    // Insert cells with the prompt and description values
     const promptCell = row.insertCell(0);
     promptCell.textContent = prompt;
 
     const descriptionCell = row.insertCell(1);
     descriptionCell.textContent = description;
 
-    // Create edit and delete buttons in the last cell
     const editButton = document.createElement("button");
     editButton.className = "btn btn-success";
     editButton.textContent = "Edit";
@@ -416,7 +409,6 @@ form.addEventListener("submit", function (e) {
     editButton.addEventListener("click", function () {
       promptInput.value = promptCell.textContent;
       promptInput.disabled = true;
-      // promptInput.contentEditable = false;
       descriptionInput.value = descriptionCell.textContent;
       selectedRow = row;
     });
@@ -446,9 +438,7 @@ function add_key_value(prompt, description, table_name) {
     .then((res) => {
       jsonData = res;
       let data = {};
-      // console.log("local jsonData: ", jsonData);
       if (jsonData && table_name == "prompts_table") {
-        // Parse the JSON data into a JavaScript object
         try {
           data = JSON.parse(jsonData) || {};
         } catch (err) {
@@ -460,7 +450,6 @@ function add_key_value(prompt, description, table_name) {
       data[prompt] = description;
       // Convert the updated object back to JSON format
       const updatedJsonData = JSON.stringify(data);
-      // console.log("updated jsonData: ", updatedJsonData);
       // Save the updated JSON data to local storage
       if (table_name == "prompts_table") {
         chrome.storage.local.set({ prompts_table: updatedJsonData });
@@ -483,7 +472,6 @@ function update_key_value(prompt, description) {
       jsonData = res;
       let data = {};
       if (jsonData) {
-        // Parse the JSON data into a JavaScript object
         try {
           data = JSON.parse(jsonData) || {};
         } catch (err) {
@@ -507,7 +495,6 @@ function remove_key(prompt, table_name) {
       jsonData = res;
       let data = {};
       if (jsonData) {
-        // Parse the JSON data into a JavaScript object
         try {
           data = JSON.parse(jsonData) || {};
         } catch (err) {
