@@ -4,6 +4,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
   }
   checkIfPinned();
 });
+
 async function checkIfPinned() {
   let userSettings = await chrome.action.getUserSettings();
   if (userSettings.isOnToolbar == "true") {

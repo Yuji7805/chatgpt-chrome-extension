@@ -617,8 +617,8 @@ getFromChromeStorage("streams_table")
       // Parse the JSON data into a JavaScript object
       try {
         var optionElement = document.createElement("option"); // Create an option element
-        optionElement.value = "SELECT_STREAM"; // Set the value of the option to the key
-        optionElement.textContent = "SELECT_STREAM"; // Set the text content of the option to the key
+        optionElement.value = "Default"; // Set the value of the option to the key
+        optionElement.textContent = "Default"; // Set the text content of the option to the key
         stream_select.appendChild(optionElement);
         for (var asstIdx in res) {
           console.log("$$$ " + res[asstIdx]["name"]);
