@@ -855,6 +855,8 @@ submitButton.addEventListener("click", async () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Access-Control-Allow-Origin":
+          "https://main-monster-decent.ngrok-free.app",
       },
       body: JSON.stringify({
         thdid: thdid,
