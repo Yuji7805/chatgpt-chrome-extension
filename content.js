@@ -849,14 +849,12 @@ submitButton.addEventListener("click", async () => {
   let gptAnswer = "data";
   answer.innerHTML = "";
   answerWrapper.style.display = "none";
-  loadingIndicator.style.display = "block";
+  // loadingIndicator.style.display = "block";
   try {
     fetch("https://main-monster-decent.ngrok-free.app/openai/run", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin":
-          "https://main-monster-decent.ngrok-free.app",
       },
       body: JSON.stringify({
         thdid: thdid,
