@@ -825,6 +825,150 @@ getFromChromeStorage("openai_thdid")
   });
 
 //click answer button
+// submitButton.addEventListener("click", async () => {
+//   const message = query_input.value;
+//   messageArray.push({ role: "user", content: message });
+//   var asstId = findAssistantId();
+//   var content = query_input.value;
+//   var thdid = JSON.parse(thdId)["openai_thdid"];
+
+//   if (asstId == undefined || !asstId) {
+//     alert("Please select Stream");
+//     return;
+//   }
+//   if (thdid == undefined) {
+//     alert("An error occured.\nPlease reinstall the extension.");
+//     return;
+//   }
+//   if (content == undefined) {
+//     alert("You didn't select any text.");
+//     return;
+//   }
+//   let gptAnswer = "data";
+//   // Display the loading indicator at the start
+//   loadingIndicator.style.display = "block";
+//   answer.innerHTML = "";
+//   answerWrapper.style.display = "none";
+//   try {
+//     fetch("https://main-monster-decent.ngrok-free.app/openai/run", {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({
+//         thdid: thdid,
+//         asstid: asstId,
+//         content: content,
+//       }),
+//     })
+//       .then((response) => {
+//         if (!response.ok) {
+//           throw new Error("Network response was not ok");
+//         }
+//         return response.json();
+//       })
+//       .then((data) => {
+//         // Handle the response data here
+//         console.log(data);
+//         gptAnswer = data["content"][0]["text"];
+//         console.log(gptAnswer);
+//         answerWrapper.style.display = "block";
+//         let answerWithBreaks = gptAnswer.replace(/\n/g, "<br>");
+
+//         // Add the fetched content to the page
+//         answer.innerHTML = answerWithBreaks;
+//         answerWrapper.style.display = "block";
+//       })
+//       .catch((error) => {
+//         console.error("Error:", error);
+//       });
+
+//     let count = 0;
+//     copyAnswer.addEventListener("click", () => {
+//       const answerText = gptAnswer;
+//       navigator.clipboard
+//         .writeText(answerText)
+//         .then(() => console.log("Answer text copied to clipboard"))
+//         .catch((err) => console.error("Could not copy text: ", err));
+//     });
+
+//     insertButton.addEventListener("click", () => {
+//       if (count == 0 && pasteTarget.tagName == "TEXTAREA") {
+//         // console.log(pasteTarget.tagName());
+//         let answerText = "\n" + gptAnswer;
+//         let finalTarget = pasteTarget.parentNode.querySelector(".D5aOJc.vJwDU");
+//         console.log(
+//           "previous content: ",
+//           finalTarget.tagName,
+//           finalTarget.className
+//         );
+//         query_input.value = "";
+//         var exisitingText = finalTarget.value;
+//         finalTarget.value = exisitingText + answerText;
+//         setTimeout(function () {
+//           finalTarget.dispatchEvent(new Event("input"));
+//         }, 0);
+//         console.log("current content is:", finalTarget.value);
+//         pasteTarget = "";
+//         count = +1;
+//         answerWrapper.style.display = "none";
+//         if (!topChecked) {
+//           insertBox.style.display = "none";
+//         }
+//       } else if (
+//         count == 0 &&
+//         pasteTarget.classList.contains("public-DraftStyleDefault-block")
+//       ) {
+//         let answerText = "\n" + gptAnswer;
+//         query_input.value = "";
+//         var terminalTarget = pasteTarget.querySelector("span");
+//         var finalTarget = terminalTarget.querySelector("span");
+//         finalTarget.innerHTML += answerText;
+//         finalTarget.textContent += " ";
+//         finalTarget.textContent = finalTarget.textContent.trim();
+//         pasteTarget = "";
+//         count = +1;
+//         answerWrapper.style.display = "none";
+//         if (!topChecked) {
+//           insertBox.style.display = "none";
+//         }
+//       } else if (count == 0) {
+//         let answerText = "\n" + gptAnswer;
+//         console.log("previous content: ", pasteTarget.innerHTML);
+//         query_input.value = "";
+
+//         pasteTarget.innerHTML += answerText;
+//         console.log("current content is:", pasteTarget.innerHTML);
+//         pasteTarget = "";
+//         count = +1;
+//         answerWrapper.style.display = "none";
+//         if (!topChecked) {
+//           insertBox.style.display = "none";
+//         }
+//       }
+//     });
+
+//     const options = {
+//       month: "short",
+//       day: "2-digit",
+//       hour: "2-digit",
+//       minute: "2-digit",
+//       second: "2-digit",
+//     };
+//     const time = new Date().toLocaleString("en-US", options);
+
+//     timestamp.innerText = time;
+
+//     loadingIndicator.style.display = "none";
+//   } catch (error) {
+//     console.error("Error:", error);
+//     answer.innerText = "Failed to load data.";
+//     answerWrapper.style.display = "block";
+//   } finally {
+//     // Hide the loading indicator after fetch operation is complete
+//     loadingIndicator.style.display = "none";
+//   }
+// });
 submitButton.addEventListener("click", async () => {
   const message = query_input.value;
   messageArray.push({ role: "user", content: message });
@@ -832,134 +976,55 @@ submitButton.addEventListener("click", async () => {
   var content = query_input.value;
   var thdid = JSON.parse(thdId)["openai_thdid"];
 
-  if (asstId == undefined || !asstId) {
+  if (asstId === undefined || !asstId) {
     alert("Please select Stream");
     return;
   }
-  if (thdid == undefined) {
+  if (thdid === undefined) {
     alert("An error occured.\nPlease reinstall the extension.");
     return;
   }
-  if (content == undefined) {
+  if (content === undefined) {
     alert("You didn't select any text.");
     return;
   }
-  let gptAnswer = "data";
+
   // Display the loading indicator at the start
   loadingIndicator.style.display = "block";
   answer.innerHTML = "";
   answerWrapper.style.display = "none";
+
   try {
-    fetch("https://main-monster-decent.ngrok-free.app/openai/run", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        thdid: thdid,
-        asstid: asstId,
-        content: content,
-      }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        // Handle the response data here
-        console.log(data);
-        gptAnswer = data["content"][0]["text"];
-        console.log(gptAnswer);
-        answerWrapper.style.display = "block";
-        let answerWithBreaks = gptAnswer.replace(/\n/g, "<br>");
-
-        // Add the fetched content to the page
-        answer.innerHTML = answerWithBreaks;
-        answerWrapper.style.display = "block";
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-
-    let count = 0;
-    copyAnswer.addEventListener("click", () => {
-      const answerText = gptAnswer;
-      navigator.clipboard
-        .writeText(answerText)
-        .then(() => console.log("Answer text copied to clipboard"))
-        .catch((err) => console.error("Could not copy text: ", err));
-    });
-
-    insertButton.addEventListener("click", () => {
-      if (count == 0 && pasteTarget.tagName == "TEXTAREA") {
-        // console.log(pasteTarget.tagName());
-        let answerText = "\n" + gptAnswer;
-        let finalTarget = pasteTarget.parentNode.querySelector(".D5aOJc.vJwDU");
-        console.log(
-          "previous content: ",
-          finalTarget.tagName,
-          finalTarget.className
-        );
-        query_input.value = "";
-        var exisitingText = finalTarget.value;
-        finalTarget.value = exisitingText + answerText;
-        setTimeout(function () {
-          finalTarget.dispatchEvent(new Event("input"));
-        }, 0);
-        console.log("current content is:", finalTarget.value);
-        pasteTarget = "";
-        count = +1;
-        answerWrapper.style.display = "none";
-        if (!topChecked) {
-          insertBox.style.display = "none";
-        }
-      } else if (
-        count == 0 &&
-        pasteTarget.classList.contains("public-DraftStyleDefault-block")
-      ) {
-        let answerText = "\n" + gptAnswer;
-        query_input.value = "";
-        var terminalTarget = pasteTarget.querySelector("span");
-        var finalTarget = terminalTarget.querySelector("span");
-        finalTarget.innerHTML += answerText;
-        finalTarget.textContent += " ";
-        finalTarget.textContent = finalTarget.textContent.trim();
-        pasteTarget = "";
-        count = +1;
-        answerWrapper.style.display = "none";
-        if (!topChecked) {
-          insertBox.style.display = "none";
-        }
-      } else if (count == 0) {
-        let answerText = "\n" + gptAnswer;
-        console.log("previous content: ", pasteTarget.innerHTML);
-        query_input.value = "";
-
-        pasteTarget.innerHTML += answerText;
-        console.log("current content is:", pasteTarget.innerHTML);
-        pasteTarget = "";
-        count = +1;
-        answerWrapper.style.display = "none";
-        if (!topChecked) {
-          insertBox.style.display = "none";
-        }
+    let response = await fetch(
+      "https://main-monster-decent.ngrok-free.app/openai/run",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          thdid: thdid,
+          asstid: asstId,
+          content: content,
+        }),
       }
-    });
+    );
 
-    const options = {
-      month: "short",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    };
-    const time = new Date().toLocaleString("en-US", options);
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
 
-    timestamp.innerText = time;
+    let data = await response.json();
 
-    loadingIndicator.style.display = "none";
+    // Handle the response data here
+    console.log(data);
+    let gptAnswer = data["content"][0]["text"];
+    console.log(gptAnswer);
+    let answerWithBreaks = gptAnswer.replace(/\n/g, "<br>");
+
+    // Add the fetched content to the page
+    answer.innerHTML = answerWithBreaks;
+    answerWrapper.style.display = "block";
   } catch (error) {
     console.error("Error:", error);
     answer.innerText = "Failed to load data.";
@@ -968,7 +1033,19 @@ submitButton.addEventListener("click", async () => {
     // Hide the loading indicator after fetch operation is complete
     loadingIndicator.style.display = "none";
   }
+
+  const options = {
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  };
+
+  const time = new Date().toLocaleString("en-US", options);
+  timestamp.innerText = time;
 });
+
 
 function checkPrompt(prompt_question) {
   let promptLen = 0;
