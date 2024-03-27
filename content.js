@@ -831,9 +831,7 @@ submitButton.addEventListener("click", async () => {
   var asstId = findAssistantId();
   var content = query_input.value;
   var thdid = JSON.parse(thdId)["openai_thdid"];
-  // console.log(content);
-  // console.log(thdid);
-  // console.log(asstId);
+
   if (asstId == undefined || !asstId) {
     alert("Please select Stream");
     return;
@@ -847,9 +845,10 @@ submitButton.addEventListener("click", async () => {
     return;
   }
   let gptAnswer = "data";
+  // Display the loading indicator at the start
+  loadingIndicator.style.display = "block";
   answer.innerHTML = "";
   answerWrapper.style.display = "none";
-  // loadingIndicator.style.display = "block";
   try {
     fetch("https://main-monster-decent.ngrok-free.app/openai/run", {
       method: "POST",
@@ -875,7 +874,10 @@ submitButton.addEventListener("click", async () => {
         console.log(gptAnswer);
         answerWrapper.style.display = "block";
         let answerWithBreaks = gptAnswer.replace(/\n/g, "<br>");
+
+        // Add the fetched content to the page
         answer.innerHTML = answerWithBreaks;
+        answerWrapper.style.display = "block";
       })
       .catch((error) => {
         console.error("Error:", error);
@@ -959,11 +961,11 @@ submitButton.addEventListener("click", async () => {
 
     loadingIndicator.style.display = "none";
   } catch (error) {
-    console.log(error);
-
+    console.error("Error:", error);
+    answer.innerText = "Failed to load data.";
     answerWrapper.style.display = "block";
-    answer.innerText = error;
-
+  } finally {
+    // Hide the loading indicator after fetch operation is complete
     loadingIndicator.style.display = "none";
   }
 });
