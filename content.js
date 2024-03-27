@@ -980,7 +980,8 @@ function checkPrompt(prompt_question) {
 }
 // promptSelector that was manualized in option
 prompt_select.addEventListener("change", () => {
-  prompt_question = _data[prompt_select.value];
+  // prompt_question = _data[prompt_select.value];
+  prompt_question = prompt_select.value;
   let result = checkPrompt(prompt_question);
   console.log(result);
   if (result == 0) {
