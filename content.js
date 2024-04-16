@@ -993,7 +993,7 @@ submitButton.addEventListener("click", async () => {
   loadingIndicator.style.display = "block";
   answer.innerHTML = "";
   answerWrapper.style.display = "none";
-
+  // loadingIndicator.style.display = "block";
   try {
     let response = await fetch("https://al3rt.me/openai/run", {
       method: "POST",
