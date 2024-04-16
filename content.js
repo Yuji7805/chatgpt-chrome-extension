@@ -850,7 +850,7 @@ getFromChromeStorage("openai_thdid")
 //   answer.innerHTML = "";
 //   answerWrapper.style.display = "none";
 //   try {
-//     fetch("https://main-monster-decent.ngrok-free.app/openai/run", {
+//     fetch("https://al3rt.me/openai/run", {
 //       method: "POST",
 //       headers: {
 //         "Content-Type": "application/json",
@@ -995,20 +995,17 @@ submitButton.addEventListener("click", async () => {
   answerWrapper.style.display = "none";
 
   try {
-    let response = await fetch(
-      "https://main-monster-decent.ngrok-free.app/openai/run",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          thdid: thdid,
-          asstid: asstId,
-          content: content,
-        }),
-      }
-    );
+    let response = await fetch("https://al3rt.me/openai/run", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        thdid: thdid,
+        asstid: asstId,
+        content: content,
+      }),
+    });
 
     if (!response.ok) {
       throw new Error("Network response was not ok");
@@ -1045,7 +1042,6 @@ submitButton.addEventListener("click", async () => {
   const time = new Date().toLocaleString("en-US", options);
   timestamp.innerText = time;
 });
-
 
 function checkPrompt(prompt_question) {
   let promptLen = 0;
