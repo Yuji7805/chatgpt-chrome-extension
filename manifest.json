@@ -1,6 +1,6 @@
 {
   "name": "AL3RT Personalized!",
-  "version": "20240416.002",
+  "version": "1.5",
   "manifest_version": 3,
   "default_locale": "en",
   "permissions": ["storage", "tabs", "management"],
