@@ -100,6 +100,22 @@ p {
 	scrollbar-width: thin;
 }
 
+#ai-selector{
+  margin-left: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;  
+  white-space: normal;
+  word-break: break-all;
+  width: calc(100% - 45px);  
+  margin-right: 6px;
+  margin-bottom: 5px;
+  scrollbar-width: thin;  
+  overflow: scroll;
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 32px;
+}
+
 #stream-selector{
   margin-left: 4px;
   border: 1px solid #ccc;
@@ -1073,18 +1089,48 @@ prompt_select.addEventListener("change", () => {
     submitButton.disabled = false;
   }
 });
+//  AI model selection group
+const aiModelSelectGroup = document.createElement("span");
+// Create a new select element
+var aiModels = document.createElement("select");
+aiModels.id = "ai-selector";
+aiModels.classList.add("form-select");
+// aiModels.id = "apiModel";
 
+// Create option 1
+var option1 = document.createElement("option");
+option1.value = "gpt-3.5-turbo";
+option1.textContent = "GPT-3.5-Turbo";
+
+// Create option 2
+var option2 = document.createElement("option");
+option2.value = "gpt-4";
+option2.textContent = "GPT-4";
+
+// Append options to the select element
+aiModels.appendChild(option1);
+aiModels.appendChild(option2);
+
+// Append the select element to a specific location in the document
+aiModelSelectGroup.appendChild(aiModels);
+
+// stream, prompt selection group
 const promptSelectGroup = document.createElement("span");
 promptSelectGroup.style.display = "flex";
 promptSelectGroup.appendChild(stream_select);
 promptSelectGroup.appendChild(prompt_select);
 promptSelectGroup.appendChild(closeButton);
+
+// query answer selection group
 const queryInputGroup = document.createElement("span");
 queryInputGroup.style.display = "flex";
 
 queryInputGroup.appendChild(query_input);
 queryInputGroup.appendChild(submitButton);
+
+// whole ui to add groups
 query_selector.appendChild(promptSelectGroup);
+query_selector.appendChild(aiModelSelectGroup);
 query_selector.appendChild(queryInputGroup);
 
 inputContainer.appendChild(query_selector);
