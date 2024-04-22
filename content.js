@@ -138,7 +138,7 @@ p {
   white-space: normal;
   word-break: break-all;
   width: 50%;  
-  margin-right: 10px;
+  margin-right: 42px;
   margin-bottom: 5px;
   scrollbar-width: thin;  
   overflow: scroll;
@@ -1090,7 +1090,8 @@ prompt_select.addEventListener("change", () => {
   }
 });
 //  AI model selection group
-const aiModelSelectGroup = document.createElement("span");
+const aiModelSelectGroup = document.createElement("div");
+aiModelSelectGroup.style.display = "flex";
 // Create a new select element
 var aiModels = document.createElement("select");
 aiModels.id = "ai-selector";
@@ -1113,13 +1114,14 @@ aiModels.appendChild(option2);
 
 // Append the select element to a specific location in the document
 aiModelSelectGroup.appendChild(aiModels);
+aiModelSelectGroup.appendChild(closeButton);
 
 // stream, prompt selection group
 const promptSelectGroup = document.createElement("span");
 promptSelectGroup.style.display = "flex";
 promptSelectGroup.appendChild(stream_select);
 promptSelectGroup.appendChild(prompt_select);
-promptSelectGroup.appendChild(closeButton);
+// promptSelectGroup.appendChild(closeButton);
 
 // query answer selection group
 const queryInputGroup = document.createElement("span");
@@ -1129,8 +1131,8 @@ queryInputGroup.appendChild(query_input);
 queryInputGroup.appendChild(submitButton);
 
 // whole ui to add groups
-query_selector.appendChild(promptSelectGroup);
 query_selector.appendChild(aiModelSelectGroup);
+query_selector.appendChild(promptSelectGroup);
 query_selector.appendChild(queryInputGroup);
 
 inputContainer.appendChild(query_selector);
