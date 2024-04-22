@@ -1099,13 +1099,13 @@ aiModels.classList.add("form-select");
 
 // Create option 1
 var option1 = document.createElement("option");
-option1.value = "gpt-3.5-turbo";
-option1.textContent = "GPT-3.5-Turbo";
+option1.value = "gpt-3.5";
+option1.textContent = "GPT-3.5";
 
 // Create option 2
 var option2 = document.createElement("option");
-option2.value = "gpt-4";
-option2.textContent = "GPT-4";
+option2.value = "gpt-4 (beta)";
+option2.textContent = "GPT-4 (beta)";
 
 // Append options to the select element
 aiModels.appendChild(option1);
