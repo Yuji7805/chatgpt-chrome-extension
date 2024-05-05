@@ -422,6 +422,14 @@ p {
 }
 `;
 
+// add hotkey ctrl+alt+x listener
+document.addEventListener("keydown", function (event) {
+  if (event.ctrlKey && event.altKey && event.key === "x") {
+    // Perform actions when Ctrl+Alt+X is pressed
+    showInputFields();
+  }
+});
+
 let assistants = [];
 
 let currentPosX = 0;
