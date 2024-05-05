@@ -1108,9 +1108,32 @@ var option2 = document.createElement("option");
 option2.value = "gpt-4 (beta)";
 option2.textContent = "GPT-4 (beta)";
 
+// Create option 2
+var option3 = document.createElement("option");
+option3.disabled = true
+option3.value = "AI2";
+option3.textContent = "AI2";
+
+// Create option 2
+var option4 = document.createElement("option");
+option4.disabled = true
+option4.value = "Claude";
+option4.textContent = "Claude";
+
+// Create option 2
+var option5 = document.createElement("option");
+option5.disabled = true
+option5.value = "Gemini";
+option5.textContent = "Gemini";
+
+
+
 // Append options to the select element
 aiModels.appendChild(option1);
 aiModels.appendChild(option2);
+aiModels.appendChild(option3);
+aiModels.appendChild(option4);
+aiModels.appendChild(option5);
 
 // Append the select element to a specific location in the document
 aiModelSelectGroup.appendChild(aiModels);
