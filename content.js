@@ -122,7 +122,7 @@ p {
   border-radius: 4px;  
   white-space: normal;
   word-break: break-all;
-  width: 50%;  
+  width: 95%;  
   margin-right: 6px;
   margin-bottom: 5px;
   scrollbar-width: thin;  
@@ -137,7 +137,7 @@ p {
   border-radius: 4px;  
   white-space: normal;
   word-break: break-all;
-  width: 50%;  
+  width: 95%;  
   margin-right: 42px;
   margin-bottom: 5px;
   scrollbar-width: thin;  
@@ -1110,23 +1110,21 @@ option2.textContent = "GPT-4 (beta)";
 
 // Create option 2
 var option3 = document.createElement("option");
-option3.disabled = true
+option3.disabled = true;
 option3.value = "AI2";
 option3.textContent = "AI2";
 
 // Create option 2
 var option4 = document.createElement("option");
-option4.disabled = true
+option4.disabled = true;
 option4.value = "Claude";
 option4.textContent = "Claude";
 
 // Create option 2
 var option5 = document.createElement("option");
-option5.disabled = true
+option5.disabled = true;
 option5.value = "Gemini";
 option5.textContent = "Gemini";
-
-
 
 // Append options to the select element
 aiModels.appendChild(option1);
@@ -1141,7 +1139,22 @@ aiModelSelectGroup.appendChild(closeButton);
 
 // stream, prompt selection group
 const promptSelectGroup = document.createElement("span");
-promptSelectGroup.style.display = "flex";
+// Create labels for stream and prompt
+const streamLabel = document.createElement("label");
+streamLabel.textContent = "Stream:";
+streamLabel.style.color = "white";
+streamLabel.style.padding = "2px";
+const promptLabel = document.createElement("label");
+promptLabel.textContent = "Prompt:";
+promptLabel.style.color = "white";
+promptLabel.style.padding = "2px";
+
+promptSelectGroup.style.display = "grid";
+promptSelectGroup.style.gridTemplateColumns = "1fr 1fr";
+promptSelectGroup.style.gridTemplateRows = "auto auto";
+promptSelectGroup.style.width = "calc(100% - 32px)";
+promptSelectGroup.appendChild(streamLabel);
+promptSelectGroup.appendChild(promptLabel);
 promptSelectGroup.appendChild(stream_select);
 promptSelectGroup.appendChild(prompt_select);
 // promptSelectGroup.appendChild(closeButton);
